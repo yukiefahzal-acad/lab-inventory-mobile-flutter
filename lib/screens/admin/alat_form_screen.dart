@@ -20,7 +20,6 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage() async {
-    // Note: Standard visual requirement is neutral 5500K lighting studio.
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
@@ -33,13 +32,11 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // Using normal post since multipart is not fully specified in PRD,
-    // assuming backend handles base64 or separate upload.
     final res = await ApiService.post('api/alat', {
       'nama': _namaCtrl.text,
       'deskripsi': _deskripsiCtrl.text,
       'status_awal': _statusAwalCtrl.text,
-      'foto_url': _imageFile != null ? 'uploaded_dummy_url' : null, // Placeholder for photo
+      'foto_url': _imageFile != null ? 'uploaded_dummy_url' : null,
     });
 
     setState(() => _isLoading = false);

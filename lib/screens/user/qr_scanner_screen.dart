@@ -4,7 +4,7 @@ import '../../core/api_service.dart';
 import 'peminjaman_form_screen.dart';
 
 class QRScannerScreen extends StatefulWidget {
-  final String action; // 'booking' or 'return'
+  final String action;
   const QRScannerScreen({super.key, required this.action});
 
   @override
@@ -39,12 +39,10 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       _controller.stop();
 
       if (widget.action == 'booking') {
-        // Quick book via QR
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => PeminjamanFormScreen(initialAlatId: qrCode)),
         );
       } else if (widget.action == 'return') {
-        // Return verification matching physical QR with active database records
         final res = await ApiService.post('api/pengembalian', {'qr_code': qrCode});
         if (!mounted) return;
         if (res.status == 'success') {

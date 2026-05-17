@@ -85,7 +85,6 @@ class ApiService {
       );
     }
 
-    // Default response
     return ApiResponse(
       status: 'success',
       message: 'Simulation data for $endpoint',

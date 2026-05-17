@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/api_service.dart';
 
 class PeminjamanFormScreen extends StatefulWidget {
-  final String? initialAlatId; // If navigated from QR
+  final String? initialAlatId;
   const PeminjamanFormScreen({super.key, this.initialAlatId});
 
   @override

@@ -57,7 +57,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlatFormScreen()));
-          _fetchAlat(); // Refresh after returning
+          _fetchAlat();
         },
         child: const Icon(Icons.add),
       ),

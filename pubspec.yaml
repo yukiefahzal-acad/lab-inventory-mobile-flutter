@@ -40,6 +40,7 @@ dependencies:
   mobile_scanner: ^7.2.0
   fl_chart: ^1.2.0
   image_picker: ^1.2.2
+  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - .env
+    - assets/images/splashscreen.png
+    - assets/images/logo_unibi.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
