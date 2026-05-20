@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../core/api_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+// import '../../core/api_service.dart';
+import '../../core/api_client.dart';
 import 'peminjaman_form_screen.dart';
 
 class QRScannerScreen extends StatefulWidget {
@@ -45,7 +48,12 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         );
       } else if (widget.action == 'return') {
         // Return verification matching physical QR with active database records
-        final res = await ApiService.post('api/pengembalian', {'qr_code': qrCode});
+        final response = await http.post(
+          Uri.parse('${ApiClient.baseUrl}api/pengembalian'),
+          headers: await ApiClient.getHeaders(),
+          body: jsonEncode({'qr_code': qrCode}),
+        );
+        final res = ApiClient.processResponse(response);
         if (!mounted) return;
         if (res.status == 'success') {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Alat berhasil dikembalikan.')));

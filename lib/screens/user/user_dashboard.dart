@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/api_service.dart';
-import '../../models/models.dart';
+import 'package:http/http.dart' as http;
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../core/api_service.dart';
+// import '../../models/models.dart';
+// import '../auth/login_screen.dart';
+import '../../core/api_client.dart';
+import '../../models/peminjaman_model.dart';
+import '../../services/auth_service.dart';
 import '../auth/login_screen.dart';
 import 'peminjaman_form_screen.dart';
 import 'qr_scanner_screen.dart';
@@ -26,7 +31,12 @@ class _UserDashboardState extends State<UserDashboard> {
 
   Future<void> _fetchActiveLoans() async {
     setState(() => _isLoading = true);
-    final res = await ApiService.get('api/user/peminjaman/active');
+    // final res = await ApiService.get('api/user/peminjaman/active');
+    final response = await http.get(
+      Uri.parse('${ApiClient.baseUrl}api/user/peminjaman/riwayat'),
+      headers: await ApiClient.getHeaders(),
+    );
+    final res = ApiClient.processResponse(response);
     if (res.status == 'success' && res.data != null) {
       final List<dynamic> data = res.data;
       setState(() {
@@ -37,8 +47,9 @@ class _UserDashboardState extends State<UserDashboard> {
   }
 
   Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.clear();
+    await AuthService.logout();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
   }
@@ -72,7 +83,8 @@ class _UserDashboardState extends State<UserDashboard> {
                                 color: Colors.blue.shade50,
                                 child: ListTile(
                                   title: Text('ID Alat: ${loan.alatId}'),
-                                  subtitle: Text('Batas Kembali: ${loan.tanggalKembali}\nStatus: ${loan.status}'),
+                                  // subtitle: Text('Batas Kembali: ${loan.tanggalKembali}\nStatus: ${loan.status}'),
+                                  subtitle: Text('Batas Kembali: ${loan.tanggalKembaliRencana}\nStatus: ${loan.status}'),
                                   trailing: const Icon(Icons.warning, color: Colors.orange),
                                 ),
                               );

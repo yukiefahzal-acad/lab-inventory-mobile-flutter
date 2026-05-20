@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
+// import '../../core/api_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../core/api_client.dart';
 
 class PeminjamanFormScreen extends StatefulWidget {
   final String? initialAlatId; // If navigated from QR
@@ -26,11 +29,23 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    final res = await ApiService.post('api/peminjaman', {
-      'alat_id': int.tryParse(_alatIdCtrl.text),
-      'tanggal_pinjam': _tanggalPinjamCtrl.text,
-      'tanggal_kembali': _tanggalKembaliCtrl.text,
-    });
+    // final res = await ApiService.post('api/peminjaman', {
+    //   'alat_id': int.tryParse(_alatIdCtrl.text),
+    //   'tanggal_pinjam': _tanggalPinjamCtrl.text,
+    //   'tanggal_kembali': _tanggalKembaliCtrl.text,
+    // });
+
+    final response = await http.post(
+      Uri.parse('${ApiClient.baseUrl}api/booking'),
+      headers: await ApiClient.getHeaders(),
+      body: jsonEncode({
+        'alat_id': int.tryParse(_alatIdCtrl.text),
+        'tanggal_pinjam': _tanggalPinjamCtrl.text,
+        'tanggal_kembali_rencana': _tanggalKembaliCtrl.text,
+      }),
+    );
+
+    final res = ApiClient.processResponse(response);
 
     setState(() => _isLoading = false);
 

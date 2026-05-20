@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../core/api_service.dart';
+import '../../services/alat_service.dart';
+// import '../../core/api_service.dart';
 
 class AlatFormScreen extends StatefulWidget {
   const AlatFormScreen({super.key});
@@ -12,9 +13,13 @@ class AlatFormScreen extends StatefulWidget {
 
 class _AlatFormScreenState extends State<AlatFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _namaCtrl = TextEditingController();
-  final _deskripsiCtrl = TextEditingController();
-  final _statusAwalCtrl = TextEditingController(text: 'Indikasi Aman Pengiriman');
+  final _kodeAlatCtrl = TextEditingController();
+  final _namaAlatCtrl = TextEditingController();
+  final _stokTotalCtrl = TextEditingController(text: '1');
+  final _spesifikasiCtrl = TextEditingController();
+  // final _namaCtrl = TextEditingController();
+  // final _deskripsiCtrl = TextEditingController();
+  // final _statusAwalCtrl = TextEditingController(text: 'Indikasi Aman Pengiriman');
   bool _isLoading = false;
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
@@ -35,12 +40,20 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
 
     // Using normal post since multipart is not fully specified in PRD,
     // assuming backend handles base64 or separate upload.
-    final res = await ApiService.post('api/alat', {
-      'nama': _namaCtrl.text,
-      'deskripsi': _deskripsiCtrl.text,
-      'status_awal': _statusAwalCtrl.text,
-      'foto_url': _imageFile != null ? 'uploaded_dummy_url' : null, // Placeholder for photo
-    });
+    // final res = await ApiService.post('api/alat', {
+    //   'nama': _namaCtrl.text,
+    //   'deskripsi': _deskripsiCtrl.text,
+    //   'status_awal': _statusAwalCtrl.text,
+    //   'foto_url': _imageFile != null ? 'uploaded_dummy_url' : null, // Placeholder for photo
+    // });
+
+    final res = await AlatService.createAlat(
+      kodeAlat: _kodeAlatCtrl.text,
+      namaAlat: _namaAlatCtrl.text,
+      stokTotal: int.tryParse(_stokTotalCtrl.text) ?? 0,
+      spesifikasi: _spesifikasiCtrl.text,
+      imageFile: _imageFile,
+    );
 
     setState(() => _isLoading = false);
 
@@ -64,21 +77,31 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
           child: Column(
             children: [
               TextFormField(
-                controller: _namaCtrl,
-                decoration: const InputDecoration(labelText: 'Nama Alat'),
+                // controller: _namaCtrl,
+                controller: _kodeAlatCtrl,
+                decoration: const InputDecoration(labelText: 'Kode Alat'),
                 validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _deskripsiCtrl,
-                decoration: const InputDecoration(labelText: 'Deskripsi'),
+                // controller: _stokTotal
+                controller: _namaAlatCtrl,
+                decoration: const InputDecoration(labelText: 'Nama Alat'),
                 maxLines: 3,
                 validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _statusAwalCtrl,
-                decoration: const InputDecoration(labelText: 'Status Awal (Wajib)'),
+                // controller: _status,
+                controller: _spesifikasiCtrl,
+                decoration: const InputDecoration(labelText: 'Spesifikasi / Deskripsi'),
+                maxLines: 3,
+                validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
+              ),
+              TextFormField(
+                controller: _stokTotalCtrl,
+                decoration: const InputDecoration(labelText: 'Stok Total'),
+                keyboardType: TextInputType.number,
                 validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
               ),
               const SizedBox(height: 16),

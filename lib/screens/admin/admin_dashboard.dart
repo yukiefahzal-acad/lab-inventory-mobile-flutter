@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/auth_service.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import '../auth/login_screen.dart';
 import 'alat_list_screen.dart';
 import 'denda_list_screen.dart';
@@ -14,8 +15,9 @@ class AdminDashboard extends StatefulWidget {
 
 class _AdminDashboardState extends State<AdminDashboard> {
   Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.clear();
+    await AuthService.logout();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
   }

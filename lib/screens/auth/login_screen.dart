@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/api_service.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../core/api_service.dart';
+import '../../services/auth_service.dart';
 import '../admin/admin_dashboard.dart';
 import '../user/user_dashboard.dart';
 import 'register_screen.dart';
@@ -13,29 +14,31 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameCtrl = TextEditingController();
+  // final _usernameCtrl = TextEditingController();
+  final _nimNipCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _login() async {
     setState(() => _isLoading = true);
-    final res = await ApiService.post('api/login', {
-      'username': _usernameCtrl.text,
-      'password': _passwordCtrl.text,
-    });
+    // final res = await ApiService.post('api/login', {
+    //   'username': _usernameCtrl.text,
+    //   'password': _passwordCtrl.text,
+    // });
+    final res = await AuthService.login(_nimNipCtrl.text, _passwordCtrl.text);
 
     setState(() => _isLoading = false);
 
     if (res.status == 'success' && res.data != null) {
-      final token = res.data['token'];
+      // final token = res.data['token'];
       final role = res.data['role'];
       
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-      await prefs.setString('role', role);
+      // final prefs = await SharedPreferences.getInstance();
+      // await prefs.setString('token', token);
+      // await prefs.setString('role', role);
 
       if (!mounted) return;
-      if (role == 'admin') {
+      if (role?.toLowerCase() == 'admin') {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminDashboard()));
       } else {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const UserDashboard()));
@@ -56,8 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: _usernameCtrl,
-              decoration: const InputDecoration(labelText: 'Username'),
+              // controller: _usernameCtrl,
+              // decoration: const InputDecoration(labelText: 'Username'),
+              controller: _nimNipCtrl,
+              decoration: const InputDecoration(labelText: 'NIM / NIP'),
             ),
             const SizedBox(height: 16),
             TextField(

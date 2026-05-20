@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
-import '../../models/models.dart';
+// import '../../core/api_service.dart';
+// import '../../models/models.dart';
+import '../../models/alat_model.dart';
+import '../../services/alat_service.dart';
 import 'alat_form_screen.dart';
 
 class AlatListScreen extends StatefulWidget {
@@ -22,9 +24,11 @@ class _AlatListScreenState extends State<AlatListScreen> {
 
   Future<void> _fetchAlat() async {
     setState(() => _isLoading = true);
-    final res = await ApiService.get('api/alat');
+    // final res = await ApiService.get('api/alat');
+    final res = await AlatService.fetchAlat();
     if (res.status == 'success' && res.data != null) {
-      final List<dynamic> data = res.data;
+      // final List<dynamic> data = res.data;
+      final List<dynamic> data = res.data['data'] ?? [];
       setState(() {
         _alatList = data.map((e) => Alat.fromJson(e)).toList();
       });
@@ -48,8 +52,10 @@ class _AlatListScreenState extends State<AlatListScreen> {
                 final alat = _alatList[index];
                 return ListTile(
                   leading: const Icon(Icons.handyman),
-                  title: Text(alat.nama),
-                  subtitle: Text(alat.statusAwal),
+                  // title: Text(alat.nama),
+                  title: Text(alat.namaAlat),
+                  // subtitle: Text(alat.statusAwal),
+                  subtitle: Text('Stok: ${alat.stokTotal} | ${alat.spesifikasi}'),
                   trailing: const Icon(Icons.chevron_right),
                 );
               },
