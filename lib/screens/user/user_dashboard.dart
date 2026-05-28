@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_service.dart';
+import '../../core/app_colors.dart';
 import '../../models/models.dart';
+import '../../widgets/alat_detail_modal.dart';
 import '../auth/login_screen.dart';
-import 'peminjaman_form_screen.dart';
 import 'qr_scanner_screen.dart';
-import 'user_denda_screen.dart';
 
 class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
@@ -19,11 +19,15 @@ class _UserDashboardState extends State<UserDashboard> {
   List<Peminjaman> _activeLoans = [];
   bool _isLoading = true;
   String _userName = 'Pinaya';
+  String _selectedCategory = 'Monitor';
+  List<Alat> _alatList = [];
+  bool _isLoadingAlat = false;
 
   @override
   void initState() {
     super.initState();
     _fetchDashboardData();
+    _fetchAlat();
   }
 
   Future<void> _fetchDashboardData() async {
@@ -47,6 +51,55 @@ class _UserDashboardState extends State<UserDashboard> {
     setState(() => _isLoading = false);
   }
 
+  Future<void> _fetchAlat() async {
+    setState(() => _isLoadingAlat = true);
+    final res = await ApiService.get('api/alat');
+    if (res.status == 'success' && res.data != null) {
+      final List<dynamic> data = res.data;
+      setState(() {
+        _alatList = data.map((e) => Alat.fromJson(e)).toList();
+      });
+    } else {
+      setState(() {
+        _alatList = [
+          Alat(
+            id: 1,
+            nama: 'Title',
+            deskripsi:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+            statusAwal: '50',
+            qrCode: '1',
+          ),
+          Alat(
+            id: 2,
+            nama: 'Title',
+            deskripsi:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+            statusAwal: '12',
+            qrCode: '2',
+          ),
+          Alat(
+            id: 3,
+            nama: 'Title',
+            deskripsi:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+            statusAwal: '8',
+            qrCode: '3',
+          ),
+          Alat(
+            id: 4,
+            nama: 'Title',
+            deskripsi:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+            statusAwal: '15',
+            qrCode: '4',
+          ),
+        ];
+      });
+    }
+    setState(() => _isLoadingAlat = false);
+  }
+
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -56,33 +109,26 @@ class _UserDashboardState extends State<UserDashboard> {
     ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
   }
 
-  Widget _buildLogo({double size = 48}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: const Color(0xFF6558A5).withOpacity(0.1),
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Image.asset(
-          '/images/logo_unibi.png',
-          width: size * 0.7,
-          height: size * 0.7,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/images/logo_unibi.png',
-              width: size * 0.7,
-              height: size * 0.7,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.handyman_outlined,
-                  color: const Color(0xFF6558A5),
-                  size: size * 0.5,
-                );
-              },
+  Widget _buildPlaceholderImage({double width = 80, double height = 80}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: width,
+        height: height,
+        color: Colors.grey.shade100,
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 8,
+          ),
+          itemCount: 64,
+          itemBuilder: (context, index) {
+            final row = index ~/ 8;
+            final col = index % 8;
+            final isEven = (row + col) % 2 == 0;
+            return Container(
+              color: isEven ? Colors.white : Colors.grey.shade300,
             );
           },
         ),
@@ -99,9 +145,9 @@ class _UserDashboardState extends State<UserDashboard> {
           TextField(
             decoration: InputDecoration(
               hintText: 'Cari alat',
-              suffixIcon: const Icon(Icons.search, color: Color(0xFF6558A5)),
+              suffixIcon: const Icon(Icons.search, color: AppColors.primary),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide.none,
@@ -118,13 +164,13 @@ class _UserDashboardState extends State<UserDashboard> {
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.white,
             ),
           ),
           const SizedBox(height: 6),
           const Text(
             'Kelola peminjaman dan denda Anda di sini.',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 14, color: AppColors.grey),
           ),
           const SizedBox(height: 28),
           Row(
@@ -135,7 +181,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
               GestureDetector(
@@ -144,13 +190,20 @@ class _UserDashboardState extends State<UserDashboard> {
                     _currentIndex = 2;
                   });
                 },
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
                       'Lihat semua',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.white.withOpacity(0.7),
+                      ),
                     ),
-                    Icon(Icons.chevron_right, color: Colors.grey, size: 18),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppColors.white.withOpacity(0.7),
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -160,25 +213,52 @@ class _UserDashboardState extends State<UserDashboard> {
           _activeLoans.isEmpty
               ? Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Column(
+                  child: Row(
                     children: [
-                      Icon(
-                        Icons.hourglass_empty,
-                        color: Color(0xFF6558A5),
-                        size: 40,
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Tidak ada pinjaman aktif',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4C457A),
+                      _buildPlaceholderImage(width: 72, height: 72),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Kode: UNI-000',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.black,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Nama Alat',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Dipinjam: DD/MM/YYYY',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Jatuh tempo: DD/MM/YYYY',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -190,26 +270,12 @@ class _UserDashboardState extends State<UserDashboard> {
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.handyman_outlined,
-                                color: Color(0xFF6558A5),
-                                size: 32,
-                              ),
-                            ),
-                          ),
+                          _buildPlaceholderImage(width: 72, height: 72),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
@@ -220,7 +286,7 @@ class _UserDashboardState extends State<UserDashboard> {
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF4C457A),
+                                    color: AppColors.black,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -228,7 +294,7 @@ class _UserDashboardState extends State<UserDashboard> {
                                   'Nama Alat',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.grey,
+                                    color: AppColors.grey,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -236,7 +302,7 @@ class _UserDashboardState extends State<UserDashboard> {
                                   'Dipinjam: ${loan.tanggalPinjam}',
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey,
+                                    color: AppColors.grey,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -244,7 +310,7 @@ class _UserDashboardState extends State<UserDashboard> {
                                   'Jatuh tempo: ${loan.tanggalKembali}',
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey,
+                                    color: AppColors.grey,
                                   ),
                                 ),
                               ],
@@ -264,7 +330,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
               GestureDetector(
@@ -273,13 +339,20 @@ class _UserDashboardState extends State<UserDashboard> {
                     _currentIndex = 2;
                   });
                 },
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
                       'Lihat semua',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.white.withOpacity(0.7),
+                      ),
                     ),
-                    Icon(Icons.chevron_right, color: Colors.grey, size: 18),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppColors.white.withOpacity(0.7),
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -289,34 +362,34 @@ class _UserDashboardState extends State<UserDashboard> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
               children: [
                 _buildHistoryItem(
-                  code: 'UNI-002',
-                  name: 'Kabel HDMI 5m',
-                  borrowDate: '08/05/2026',
-                  dueDate: '09/05/2026',
+                  code: 'UNI-000',
+                  name: 'Nama Alat',
+                  borrowDate: 'DD/MM/YYYY',
+                  dueDate: 'DD/MM/YYYY',
                   status: 'Selesai',
                   isDenda: false,
                 ),
                 const Divider(),
                 _buildHistoryItem(
-                  code: 'UNI-003',
-                  name: 'Mouse Logitech',
-                  borrowDate: '01/05/2026',
-                  dueDate: '03/05/2026',
+                  code: 'UNI-000',
+                  name: 'Nama Alat',
+                  borrowDate: 'DD/MM/YYYY',
+                  dueDate: 'DD/MM/YYYY',
                   status: 'Denda',
                   isDenda: true,
                 ),
                 const Divider(),
                 _buildHistoryItem(
-                  code: 'UNI-004',
-                  name: 'Keyboard Mechanical',
-                  borrowDate: '25/04/2026',
-                  dueDate: '28/04/2026',
+                  code: 'UNI-000',
+                  name: 'Nama Alat',
+                  borrowDate: 'DD/MM/YYYY',
+                  dueDate: 'DD/MM/YYYY',
                   status: 'Denda',
                   isDenda: true,
                 ),
@@ -329,7 +402,7 @@ class _UserDashboardState extends State<UserDashboard> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -337,7 +410,7 @@ class _UserDashboardState extends State<UserDashboard> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -345,47 +418,53 @@ class _UserDashboardState extends State<UserDashboard> {
               children: [
                 const Text(
                   'Total Denda',
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  style: TextStyle(fontSize: 13, color: AppColors.grey),
                 ),
-                const SizedBox(height: 6),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Rp 250.000',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF6558A5),
+                const SizedBox(height: 4),
+                const Text(
+                  'Rp 250.000',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                RichText(
+                  text: const TextSpan(
+                    style: TextStyle(fontSize: 14, fontFamily: 'Manrope'),
+                    children: [
+                      TextSpan(
+                        text: 'Status: ',
+                        style: TextStyle(color: AppColors.grey),
                       ),
-                    ),
-                    Text(
-                      'Belum Lunas',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                      TextSpan(
+                        text: 'Belum Lunas',
+                        style: TextStyle(
+                          color: AppColors.error,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 const Divider(),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     const Icon(
-                      Icons.error_outline_outlined,
-                      color: Colors.red,
-                      size: 20,
+                      Icons.dangerous_outlined,
+                      color: AppColors.black,
+                      size: 24,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
+                    const SizedBox(width: 12),
+                    const Expanded(
                       child: Text(
                         'Bayar denda tepat waktu untuk menghindari pembatasan peminjaman!',
                         style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFFC53030),
+                          fontSize: 13,
+                          color: AppColors.grey,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -413,21 +492,7 @@ class _UserDashboardState extends State<UserDashboard> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.handyman_outlined,
-                color: Color(0xFF6558A5),
-                size: 26,
-              ),
-            ),
-          ),
+          _buildPlaceholderImage(width: 60, height: 60),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -438,23 +503,23 @@ class _UserDashboardState extends State<UserDashboard> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4C457A),
+                    color: AppColors.black,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   name,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: const TextStyle(fontSize: 13, color: AppColors.grey),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Dipinjam: $borrowDate',
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: const TextStyle(fontSize: 11, color: AppColors.grey),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Jatuh tempo: $dueDate',
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: const TextStyle(fontSize: 11, color: AppColors.grey),
                 ),
               ],
             ),
@@ -462,9 +527,7 @@ class _UserDashboardState extends State<UserDashboard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: isDenda
-                  ? const Color(0xFFFDE8E8)
-                  : const Color(0xFFDEF7EC),
+              color: isDenda ? AppColors.errorBg : AppColors.successBg,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -472,7 +535,7 @@ class _UserDashboardState extends State<UserDashboard> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: isDenda ? Colors.red : Colors.green,
+                color: isDenda ? AppColors.error : AppColors.success,
               ),
             ),
           ),
@@ -481,312 +544,619 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _buildScanQRView() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.qr_code_scanner_outlined,
-                color: Colors.white,
-                size: 64,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Layanan QR Code',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Pilih jenis layanan QR yang ingin Anda gunakan',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 36),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const QRScannerScreen(action: 'booking'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Scan QR Peminjaman Alat'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6558A5),
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 54),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const QRScannerScreen(action: 'return'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.qr_code_scanner),
-            label: const Text('Scan QR Pengembalian Alat'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF6558A5),
-              minimumSize: const Size(double.infinity, 54),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-        ],
-      ),
+  Future<void> _submitPeminjaman(int alatId, int jumlah) async {
+    setState(() => _isLoading = true);
+
+    final now = DateTime.now();
+    final formattedPinjam =
+        "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
+    final returnDate = now.add(const Duration(days: 3));
+    final formattedKembali =
+        "${returnDate.month.toString().padLeft(2, '0')}/${returnDate.day.toString().padLeft(2, '0')}/${returnDate.year}";
+
+    final res = await ApiService.post('api/peminjaman', {
+      'alat_id': alatId,
+      'tanggal_pinjam': formattedPinjam,
+      'tanggal_kembali': formattedKembali,
+      'jumlah': jumlah,
+    });
+
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+    if (res.status == 'success') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Peminjaman berhasil diajukan!')),
+      );
+      _fetchDashboardData();
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(res.message)));
+    }
+  }
+
+  void _showAlatDetailModal(BuildContext context, Alat alat) {
+    AlatDetailModal.show(
+      context,
+      alat: alat,
+      onSubmit: (alatId, quantity) => _submitPeminjaman(alatId, quantity),
     );
+  }
+
+  Widget _buildKatalogView() {
+    return _isLoadingAlat
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 16.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Cari alat',
+                        suffixIcon: const Icon(
+                          Icons.search,
+                          color: AppColors.black,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: ['Monitor', 'Tools', 'Kabel', 'Tester'].map((
+                          cat,
+                        ) {
+                          final isActive = _selectedCategory == cat;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: ChoiceChip(
+                              label: Text(
+                                cat,
+                                style: TextStyle(
+                                  color: isActive
+                                      ? AppColors.black
+                                      : AppColors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              selected: isActive,
+                              onSelected: (selected) {
+                                if (selected) {
+                                  setState(() {
+                                    _selectedCategory = cat;
+                                  });
+                                }
+                              },
+                              selectedColor: const Color(0xFFE0E0F0),
+                              backgroundColor: AppColors.primaryDark,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: BorderSide(
+                                  color: isActive
+                                      ? Colors.transparent
+                                      : AppColors.primaryDark.withOpacity(0.5),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.65,
+                          ),
+                      itemCount: _alatList.length,
+                      itemBuilder: (context, index) {
+                        final alat = _alatList[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildPlaceholderImage(
+                                width: double.infinity,
+                                height: 120,
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            alat.nama.isEmpty
+                                                ? 'Title'
+                                                : alat.nama,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            alat.deskripsi.isEmpty
+                                                ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
+                                                : alat.deskripsi,
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            _showAlatDetailModal(context, alat),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF1E1548,
+                                          ),
+                                          foregroundColor: AppColors.white,
+                                          minimumSize: const Size(
+                                            double.infinity,
+                                            36,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: Text(
+                                          'Detail Alat',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 80),
+                  ],
+                ),
+              );
   }
 
   Widget _buildHistoryView() {
-    return _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              const Text(
-                'Seluruh Riwayat Peminjaman',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Cari alat',
+              suffixIcon: const Icon(
+                Icons.search,
+                color: AppColors.black,
               ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
+              filled: true,
+              fillColor: AppColors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildMockupHistoryCard(
+            name: 'Nama Alat',
+            quantity: 'x1',
+            leftText: 'Status',
+            rightText: 'Menunggu Diambil',
+            isBoldRight: true,
+          ),
+          _buildMockupHistoryCard(
+            name: 'Nama Alat',
+            quantity: 'x1',
+            leftText: '31/12/1999',
+            rightText: 'Denda: Rp 0',
+          ),
+          _buildMockupHistoryCard(
+            name: 'Nama Alat',
+            quantity: 'x1',
+            leftText: '31/12/1999',
+            rightText: 'Denda: Rp 0',
+          ),
+          _buildMockupHistoryCard(
+            name: 'Nama Alat',
+            quantity: 'x1',
+            leftText: '31/12/1999',
+            rightText: 'Denda: Rp 0',
+          ),
+          _buildMockupHistoryCard(
+            name: 'Nama Alat',
+            quantity: 'x1',
+            leftText: '31/12/1999',
+            rightText: 'Denda: Rp 0',
+          ),
+          _buildMockupHistoryCard(
+            name: 'Nama Alat',
+            quantity: 'x1',
+            leftText: '31/12/1999',
+            rightText: 'Denda: Rp 0',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockupHistoryCard({
+    required String name,
+    required String quantity,
+    required String leftText,
+    required String rightText,
+    bool isBoldRight = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDE9F6),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          _buildPlaceholderImage(width: 80, height: 80),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildHistoryItem(
-                      code: 'UNI-001',
-                      name: 'Proyektor Epson',
-                      borrowDate: '10/05/2026',
-                      dueDate: '15/05/2026',
-                      status: 'Aktif',
-                      isDenda: false,
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black,
+                      ),
                     ),
-                    const Divider(),
-                    _buildHistoryItem(
-                      code: 'UNI-002',
-                      name: 'Kabel HDMI 5m',
-                      borrowDate: '08/05/2026',
-                      dueDate: '09/05/2026',
-                      status: 'Selesai',
-                      isDenda: false,
-                    ),
-                    const Divider(),
-                    _buildHistoryItem(
-                      code: 'UNI-003',
-                      name: 'Mouse Logitech',
-                      borrowDate: '01/05/2026',
-                      dueDate: '03/05/2026',
-                      status: 'Denda',
-                      isDenda: true,
-                    ),
-                    const Divider(),
-                    _buildHistoryItem(
-                      code: 'UNI-004',
-                      name: 'Keyboard Mechanical',
-                      borrowDate: '25/04/2026',
-                      dueDate: '28/04/2026',
-                      status: 'Denda',
-                      isDenda: true,
+                    Text(
+                      quantity,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.grey,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          );
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      leftText,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                    Text(
+                      rightText,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: isBoldRight ? FontWeight.bold : FontWeight.normal,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildProfileView() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
         children: [
+          // Box 1: Profile Circular Avatar & Name
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
               children: [
-                _buildLogo(size: 80),
-                const SizedBox(height: 16),
-                Text(
-                  _userName,
-                  style: const TextStyle(
+                _buildCheckeredCircleAvatar(radius: 60),
+                const SizedBox(height: 20),
+                const Text(
+                  'Pinaya Agustin',
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4C457A),
+                    color: AppColors.black,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 const Text(
-                  'Mahasiswa UNIBI',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  '224111006',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.black,
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
+
+          // Box 2: Email & Denda
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ListTile(
-                  leading: const Icon(
-                    Icons.badge_outlined,
-                    color: Color(0xFF6558A5),
-                  ),
-                  title: const Text('NIM'),
-                  subtitle: const Text('224111006'),
-                  trailing: Icon(
-                    Icons.copy,
-                    color: Colors.grey.shade400,
-                    size: 18,
-                  ),
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(
-                    Icons.email_outlined,
-                    color: Color(0xFF6558A5),
-                  ),
-                  title: const Text('E-Mail'),
-                  subtitle: Text('pinaya@gmail.com'),
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(
-                    Icons.payments_outlined,
-                    color: Color(0xFF6558A5),
-                  ),
-                  title: const Text('Denda Belum Dibayar'),
-                  subtitle: const Text('Rp 250.000'),
-                  trailing: const Text(
-                    'BAYAR',
-                    style: TextStyle(
-                      color: Color(0xFF6558A5),
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.mail_outline,
+                      color: AppColors.black,
+                      size: 24,
                     ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const UserDendaScreen(),
+                    const SizedBox(width: 16),
+                    Text(
+                      'pinaya@gmail.com',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: AppColors.black,
                       ),
-                    );
-                  },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.payments_outlined,
+                      color: AppColors.black,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Denda Belum Dibayar',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Rp 250.000',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
+          const SizedBox(height: 24),
+
+          // Box 3: Red Logout Button
+          ElevatedButton(
             onPressed: _logout,
-            icon: const Icon(Icons.logout),
-            label: const Text('Keluar dari Akun'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 54),
+              backgroundColor: const Color(0xFFC53030),
+              foregroundColor: AppColors.white,
+              minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
               ),
+              elevation: 0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Transform.scale(
+                  scaleX: -1,
+                  child: const Icon(
+                    Icons.logout,
+                    color: AppColors.white,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Keluar',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCheckeredCircleAvatar({double radius = 50}) {
+    return ClipOval(
+      child: Container(
+        width: radius * 2,
+        height: radius * 2,
+        color: Colors.grey.shade100,
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 8,
+          ),
+          itemCount: 64,
+          itemBuilder: (context, index) {
+            final row = index ~/ 8;
+            final col = index % 8;
+            final isEven = (row + col) % 2 == 0;
+            return Container(
+              color: isEven ? Colors.white : Colors.grey.shade300,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    if (_currentIndex != 0) {
+      String title = '';
+      if (_currentIndex == 1) title = 'Katalog';
+      if (_currentIndex == 2) title = 'Riwayat Peminjaman';
+      if (_currentIndex == 3) title = 'Profil';
+
+      return AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.black),
+          onPressed: () {
+            setState(() {
+              _currentIndex = 0;
+            });
+          },
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: AppColors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: AppColors.white,
+        elevation: 0,
+      );
+    }
+
+    return AppBar(
+      title: const Text(
+        'Dashboard',
+        style: TextStyle(
+          color: AppColors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
+      ),
+      backgroundColor: AppColors.white,
+      elevation: 0,
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_none_outlined,
+            color: AppColors.black,
+          ),
+          onPressed: () {},
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
-      appBar: AppBar(
-        title: const Text(
-          'Dashboard',
-          style: TextStyle(
-            color: Color(0xFF6558A5),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_none_outlined,
-              color: Color(0xFF6558A5),
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      backgroundColor: AppColors.darkSurface,
+      appBar: _buildAppBar(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : IndexedStack(
               index: _currentIndex,
               children: [
                 _buildHomeView(),
-                _buildScanQRView(),
+                _buildKatalogView(),
                 _buildHistoryView(),
                 _buildProfileView(),
               ],
             ),
-      floatingActionButton: _currentIndex == 0
+      floatingActionButton: _currentIndex == 1
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => const PeminjamanFormScreen(),
+                    builder: (_) => const QRScannerScreen(action: 'booking'),
                   ),
                 );
               },
-              backgroundColor: const Color(0xFF6558A5),
-              foregroundColor: Colors.white,
-              child: const Icon(Icons.add),
+              backgroundColor: const Color(0xFF1E1548),
+              foregroundColor: AppColors.white,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.qr_code_scanner, size: 28),
             )
           : null,
       bottomNavigationBar: BottomNavigationBar(
@@ -797,9 +1167,9 @@ class _UserDashboardState extends State<UserDashboard> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF6558A5),
-        unselectedItemColor: Colors.grey,
+        backgroundColor: AppColors.white,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.grey,
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 12,
@@ -812,9 +1182,9 @@ class _UserDashboardState extends State<UserDashboard> {
             label: 'Beranda',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner_outlined),
-            activeIcon: Icon(Icons.qr_code_scanner),
-            label: 'Scan QR',
+            icon: Icon(Icons.grid_view_outlined),
+            activeIcon: Icon(Icons.grid_view),
+            label: 'Katalog',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),

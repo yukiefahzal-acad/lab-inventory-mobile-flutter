@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/api_service.dart';
+import '../../core/app_colors.dart';
 import '../../models/models.dart';
 
 class UserDendaScreen extends StatefulWidget {
@@ -53,7 +54,7 @@ class _UserDendaScreenState extends State<UserDendaScreen> {
                       trailing: Text(
                         denda.status.toUpperCase(),
                         style: TextStyle(
-                          color: denda.status == 'unpaid' ? Colors.red : Colors.green,
+                          color: denda.status == 'unpaid' ? AppColors.error : AppColors.success,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

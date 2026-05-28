@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/api_service.dart';
+import '../../core/app_colors.dart';
 import '../../models/models.dart';
 
 class DendaListScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _DendaListScreenState extends State<DendaListScreen> {
                           onPressed: () => _updateStatusLunas(denda.id!),
                           child: const Text('Set Lunas'),
                         )
-                      : const Icon(Icons.check_circle, color: Colors.green),
+                      : const Icon(Icons.check_circle, color: AppColors.success),
                 );
               },
             ),

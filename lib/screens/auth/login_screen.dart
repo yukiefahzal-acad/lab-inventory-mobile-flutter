@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_service.dart';
+import '../../core/app_colors.dart';
 import '../admin/admin_dashboard.dart';
 import '../user/user_dashboard.dart';
 import 'register_screen.dart';
@@ -72,8 +73,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF8672C8),
-              Color(0xFFD4C9F7),
+              AppColors.gradientStart,
+              AppColors.gradientEnd,
             ],
           ),
         ),
@@ -90,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
-                color: Colors.white,
+                color: AppColors.white,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24.0,
@@ -112,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF4C457A),
+                          color: AppColors.primaryDark,
                           height: 1.3,
                         ),
                       ),
@@ -123,33 +124,33 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.email_outlined,
-                            color: Color(0xFF6558A5),
+                            color: AppColors.primary,
                           ),
                           labelText: 'E-Mail',
                           hintText: 'Masukkan e-mail Anda',
-                          labelStyle: const TextStyle(color: Color(0xFF6558A5)),
-                          hintStyle: const TextStyle(color: Colors.grey),
+                          labelStyle: const TextStyle(color: AppColors.primary),
+                          hintStyle: const TextStyle(color: AppColors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFFC4BCE6),
+                              color: AppColors.primaryLight,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFFC4BCE6),
+                              color: AppColors.primaryLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF6558A5),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: AppColors.white,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -159,14 +160,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.vpn_key_outlined,
-                            color: Color(0xFF6558A5),
+                            color: AppColors.primary,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
-                              color: const Color(0xFF6558A5),
+                              color: AppColors.primary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -176,29 +177,29 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           labelText: 'Password',
                           hintText: 'Masukkan password Anda',
-                          labelStyle: const TextStyle(color: Color(0xFF6558A5)),
-                          hintStyle: const TextStyle(color: Colors.grey),
+                          labelStyle: const TextStyle(color: AppColors.primary),
+                          hintStyle: const TextStyle(color: AppColors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFFC4BCE6),
+                              color: AppColors.primaryLight,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFFC4BCE6),
+                              color: AppColors.primaryLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
-                              color: Color(0xFF6558A5),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: AppColors.white,
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -214,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _rememberMe = val ?? false;
                                 });
                               },
-                              activeColor: const Color(0xFF6558A5),
+                              activeColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -224,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text(
                             'Ingat Saya',
                             style: TextStyle(
-                              color: Color(0xFF4C457A),
+                              color: AppColors.primaryDark,
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
                             ),
@@ -236,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const Center(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF6558A5),
+                                  AppColors.primary,
                                 ),
                               ),
                             )
@@ -244,9 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(
-                                      0xFF6558A5,
-                                    ).withOpacity(0.3),
+                                    color: AppColors.primary.withOpacity(0.3),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -255,8 +254,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: _login,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF6558A5),
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: AppColors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -287,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           'Daftar Sekarang',
                           style: TextStyle(
-                            color: Color(0xFF6558A5),
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
