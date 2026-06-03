@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'core/app_colors.dart';
+
 import 'screens/splash_screen.dart';
 
 void main() async {
@@ -18,7 +18,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'UNIBI LAB',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 55, 128, 177),
+        ),
         useMaterial3: true,
         textTheme: GoogleFonts.manropeTextTheme(),
       ),
@@ -26,3 +28,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//#AEE2FF rgb(174, 226, 255)
