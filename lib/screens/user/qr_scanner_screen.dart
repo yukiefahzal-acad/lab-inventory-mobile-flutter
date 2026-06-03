@@ -7,7 +7,8 @@ import '../../widgets/alat_detail_modal.dart';
 
 class QRScannerScreen extends StatefulWidget {
   final String action;
-  const QRScannerScreen({super.key, required this.action});
+  final bool isTab;
+  const QRScannerScreen({super.key, required this.action, this.isTab = false});
 
   @override
   State<QRScannerScreen> createState() => _QRScannerScreenState();
@@ -33,9 +34,11 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     setState(() => _isProcessing = true);
 
     final now = DateTime.now();
-    final formattedPinjam = "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
+    final formattedPinjam =
+        "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
     final returnDate = now.add(const Duration(days: 3));
-    final formattedKembali = "${returnDate.month.toString().padLeft(2, '0')}/${returnDate.day.toString().padLeft(2, '0')}/${returnDate.year}";
+    final formattedKembali =
+        "${returnDate.month.toString().padLeft(2, '0')}/${returnDate.day.toString().padLeft(2, '0')}/${returnDate.year}";
 
     final res = await ApiService.post('api/peminjaman', {
       'alat_id': alatId,
@@ -44,24 +47,31 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       'jumlah': jumlah,
     });
 
+    // Pengecekan mounted ditambahkan sebelum merubah State/Context
+    if (!mounted) return;
+
     setState(() => _isProcessing = false);
 
-    if (!mounted) return;
     if (res.status == 'success') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Peminjaman berhasil diajukan!')),
       );
-      Navigator.of(context).pop(); // Close the QR Scanner screen
+      if (!widget.isTab) {
+        Navigator.of(context).pop();
+      } else {
+        _controller.start();
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res.message)),
+        SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
       );
+      _controller.start();
     }
   }
 
   Future<void> _handleScan(BarcodeCapture capture) async {
     if (_isProcessing) return;
-    
+
     final List<Barcode> barcodes = capture.barcodes;
     if (barcodes.isNotEmpty) {
       final String? qrCode = barcodes.first.rawValue;
@@ -72,7 +82,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
       if (widget.action == 'booking') {
         try {
-          // Fetch the matching tool from catalog endpoint
           final res = await ApiService.get('api/alat');
           Alat? selectedAlat;
           if (res.status == 'success' && res.data != null) {
@@ -87,11 +96,11 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           }
 
           if (selectedAlat == null) {
-            // Fallback mock tool info
             selectedAlat = Alat(
               id: 1,
               nama: 'Proyektor Epson',
-              deskripsi: 'Proyektor LCD Epson berkinerja tinggi. Sangat cocok untuk kebutuhan presentasi di ruang kelas atau ruang rapat.',
+              deskripsi:
+                  'Proyektor LCD Epson berkinerja tinggi. Sangat cocok untuk kebutuhan presentasi di ruang kelas atau ruang rapat.',
               statusAwal: '15',
               qrCode: qrCode,
             );
@@ -100,7 +109,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           if (!mounted) return;
           setState(() => _isProcessing = false);
 
-          // Display the same details BottomSheet modal in-place
           await AlatDetailModal.show(
             context,
             alat: selectedAlat,
@@ -109,28 +117,40 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             },
           );
 
-          // Once dismissed, restart scanner to scan again
           _controller.start();
         } catch (e) {
+          // Pengecekan mounted ditambahkan untuk menghindari exception
+          if (!mounted) return;
+
           setState(() => _isProcessing = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Terjadi kesalahan: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
           _controller.start();
         }
       } else if (widget.action == 'return') {
-        final res = await ApiService.post('api/pengembalian', {'qr_code': qrCode});
+        final res = await ApiService.post('api/pengembalian', {
+          'qr_code': qrCode,
+        });
+
         if (!mounted) return;
+        setState(() => _isProcessing = false);
+
         if (res.status == 'success') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Alat berhasil dikembalikan.')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(res.message)),
+            SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
           );
         }
-        Navigator.of(context).pop();
+
+        if (!widget.isTab) {
+          Navigator.of(context).pop();
+        } else {
+          _controller.start();
+        }
       }
     }
   }
@@ -140,12 +160,14 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     return Scaffold(
       backgroundColor: AppColors.darkSurface,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: widget.isTab
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppColors.black),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
         title: const Text(
-          'Scan QR',
+          'Scan-QR',
           style: TextStyle(
             color: AppColors.black,
             fontWeight: FontWeight.bold,
@@ -157,18 +179,11 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       ),
       body: Stack(
         children: [
-          // Background Camera scanner
-          MobileScanner(
-            controller: _controller,
-            onDetect: _handleScan,
-          ),
-          
-          // Outer indigo veil matching dark surface to focus attention
-          Container(
-            color: AppColors.darkSurface.withOpacity(0.55),
-          ),
-          
-          // Viewport Viewfinder overlay
+          MobileScanner(controller: _controller, onDetect: _handleScan),
+
+          // Sesuai kode modern Flutter Anda yang benar
+          Container(color: AppColors.darkSurface.withValues(alpha: 0.55)),
+
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -182,8 +197,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                
-                // Viewport focus box with corner styling
+
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -192,13 +206,12 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                       height: 260,
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: AppColors.primaryLight.withOpacity(0.4),
+                          color: AppColors.primaryLight.withValues(alpha: 0.4),
                           width: 1,
                         ),
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    // Frame box representing mockup lines
                     Container(
                       width: 230,
                       height: 230,
@@ -213,12 +226,14 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   ],
                 ),
                 const SizedBox(height: 35),
-                
-                // Guide text
+
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.black.withOpacity(0.65),
+                    color: AppColors.black.withValues(alpha: 0.65),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: const Text(
@@ -233,15 +248,12 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               ],
             ),
           ),
-          
-          // Async Spinner
+
           if (_isProcessing)
             Container(
-              color: AppColors.black.withOpacity(0.5),
+              color: AppColors.black.withValues(alpha: 0.5),
               child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primaryLight,
-                ),
+                child: CircularProgressIndicator(color: AppColors.primaryLight),
               ),
             ),
         ],

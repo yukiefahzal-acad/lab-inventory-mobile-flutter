@@ -4,7 +4,8 @@ import '../../core/app_colors.dart';
 import '../../models/models.dart';
 
 class DendaListScreen extends StatefulWidget {
-  const DendaListScreen({super.key});
+  final bool isTab;
+  const DendaListScreen({super.key, this.isTab = false});
 
   @override
   State<DendaListScreen> createState() => _DendaListScreenState();
@@ -30,7 +31,9 @@ class _DendaListScreenState extends State<DendaListScreen> {
       });
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(res.message)));
       }
     }
     setState(() => _isLoading = false);
@@ -41,37 +44,109 @@ class _DendaListScreenState extends State<DendaListScreen> {
     if (res.status == 'success') {
       _fetchDenda();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Status denda diperbarui ke Lunas.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Status denda diperbarui ke Lunas.')),
+        );
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(res.message)));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Validasi Denda')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _dendaList.length,
-              itemBuilder: (context, index) {
-                final denda = _dendaList[index];
-                return ListTile(
-                  title: Text('User ID: ${denda.userId} - Peminjaman: ${denda.peminjamanId}'),
-                  subtitle: Text('Rp ${denda.jumlah} | Status: ${denda.status}'),
-                  trailing: denda.status == 'unpaid'
+    final bodyContent = _isLoading
+        ? const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryLight),
+          )
+        : _dendaList.isEmpty
+        ? Center(
+            child: Text(
+              'Tidak ada denda yang perlu divalidasi.',
+              style: TextStyle(
+                color: widget.isTab ? AppColors.white : AppColors.black,
+                fontSize: 16,
+              ),
+            ),
+          )
+        : ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: _dendaList.length,
+            itemBuilder: (context, index) {
+              final denda = _dendaList[index];
+              final isUnpaid = denda.status == 'unpaid';
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: widget.isTab
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: isUnpaid
+                        ? AppColors.errorBg
+                        : AppColors.successBg,
+                    child: Icon(
+                      isUnpaid ? Icons.money_off : Icons.monetization_on,
+                      color: isUnpaid ? AppColors.error : AppColors.success,
+                    ),
+                  ),
+                  title: Text(
+                    'User ID: ${denda.userId} | Pinjam ID: ${denda.peminjamanId}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: widget.isTab ? AppColors.white : AppColors.black,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Rp ${denda.jumlah} | Status: ${denda.status}',
+                    style: TextStyle(
+                      color: widget.isTab
+                          ? AppColors.grey
+                          : Colors.grey.shade600,
+                    ),
+                  ),
+                  trailing: isUnpaid
                       ? ElevatedButton(
                           onPressed: () => _updateStatusLunas(denda.id!),
-                          child: const Text('Set Lunas'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Set Lunas',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         )
-                      : const Icon(Icons.check_circle, color: AppColors.success),
-                );
-              },
-            ),
+                      : const Icon(
+                          Icons.check_circle,
+                          color: AppColors.success,
+                        ),
+                ),
+              );
+            },
+          );
+
+    if (widget.isTab) {
+      return Scaffold(
+        backgroundColor: AppColors.darkSurface,
+        body: bodyContent,
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Validasi Denda')),
+      body: bodyContent,
     );
   }
 }

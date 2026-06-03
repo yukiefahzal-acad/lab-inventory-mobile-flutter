@@ -93,7 +93,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.gradientStart, AppColors.gradientEnd],
+            colors: [
+              Color(0xFF1A1245), // Deep dark indigo purple top
+              Color(0xFFD5CDF3), // Soft lilac lavender bottom
+            ],
           ),
         ),
         child: SafeArea(
@@ -104,10 +107,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 vertical: 16.0,
               ),
               child: Card(
-                elevation: 8,
-                shadowColor: Colors.black.withOpacity(0.12),
+                elevation: 12,
+                shadowColor: Colors.black.withValues(alpha: 0.15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 color: AppColors.white,
                 child: Padding(
@@ -119,8 +122,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Centered Logo asset with fallbacks
                       Image.asset(
-                        '/images/logo_unibi.png',
+                        'assets/images/logo_unibi.png',
                         height: 110,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
@@ -128,10 +132,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             '/images/logo_unibi.png',
                             height: 110,
                             fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.handyman_outlined,
+                                color: AppColors.primary,
+                                size: 70,
+                              );
+                            },
                           );
                         },
                       ),
                       const SizedBox(height: 20),
+
+                      // Title
                       const Text(
                         'Daftar Akun Baru',
                         textAlign: TextAlign.center,
@@ -142,12 +155,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
+
+                      // Subtitle
                       const Text(
                         'Isi data untuk mulai meminjam alat',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: AppColors.grey),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 28),
+
+                      // 1. Nama Input Field
                       TextField(
                         controller: _nameCtrl,
                         decoration: InputDecoration(
@@ -155,34 +176,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Icons.person_outline,
                             color: AppColors.primary,
                           ),
-                          labelText: 'Nama',
-                          hintText: 'Masukkan nama lengkap Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'Nama',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // 2. NIM Input Field
                       TextField(
                         controller: _nimCtrl,
                         keyboardType: TextInputType.number,
@@ -191,70 +220,86 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Icons.badge_outlined,
                             color: AppColors.primary,
                           ),
-                          labelText: 'NIM',
-                          hintText: 'Masukkan NIM Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'NIM',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // 3. Konfirmasi E-Mail Input Field
                       TextField(
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
-                            Icons.email_outlined,
+                            Icons.mail_outline,
                             color: AppColors.primary,
                           ),
-                          labelText: 'Konfirmasi E-Mail',
-                          hintText: 'Masukkan e-mail Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'Konfirmasi E-Mail',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // 4. Password Input Field
                       TextField(
                         controller: _passwordCtrl,
                         obscureText: _obscurePassword,
@@ -276,34 +321,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               });
                             },
                           ),
-                          labelText: 'Password',
-                          hintText: 'Masukkan password Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'Password',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // 5. Konfirmasi Password Input Field
                       TextField(
                         controller: _confirmPasswordCtrl,
                         obscureText: _obscureConfirmPassword,
@@ -326,34 +379,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               });
                             },
                           ),
-                          labelText: 'Konfirmasi Password',
-                          hintText: 'Masukkan kembali password Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'Konfirmasi Password',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 28),
+
+                      // Action Submit Button
                       _isLoading
                           ? const Center(
                               child: CircularProgressIndicator(
@@ -364,10 +425,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             )
                           : Container(
                               decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.3),
-                                    blurRadius: 10,
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 6,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
@@ -375,10 +437,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: ElevatedButton(
                                 onPressed: _register,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
+                                  backgroundColor: const Color(0xFF1E1548),
                                   foregroundColor: AppColors.white,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
@@ -390,18 +452,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.0,
                                   ),
                                 ),
                               ),
                             ),
                       const SizedBox(height: 20),
+
+                      // Back to login Link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
                             'Sudah punya akun? ',
-                            style: TextStyle(color: AppColors.grey, fontSize: 14),
+                            style: TextStyle(
+                              color: AppColors.grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           GestureDetector(
                             onTap: () {

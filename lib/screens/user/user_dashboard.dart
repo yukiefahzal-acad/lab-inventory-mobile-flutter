@@ -196,12 +196,12 @@ class _UserDashboardState extends State<UserDashboard> {
                       'Lihat semua',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.white.withOpacity(0.7),
+                        color: AppColors.white.withValues(alpha: 0.7),
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.white.withOpacity(0.7),
+                      color: AppColors.white.withValues(alpha: 0.7),
                       size: 18,
                     ),
                   ],
@@ -345,12 +345,12 @@ class _UserDashboardState extends State<UserDashboard> {
                       'Lihat semua',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.white.withOpacity(0.7),
+                        color: AppColors.white.withValues(alpha: 0.7),
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.white.withOpacity(0.7),
+                      color: AppColors.white.withValues(alpha: 0.7),
                       size: 18,
                     ),
                   ],
@@ -588,180 +588,185 @@ class _UserDashboardState extends State<UserDashboard> {
     return _isLoadingAlat
         ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 16.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Cari alat',
-                        suffixIcon: const Icon(
-                          Icons.search,
-                          color: AppColors.black,
-                        ),
-                        filled: true,
-                        fillColor: AppColors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 16.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
                       ),
+                    ],
+                  ),
+                  child: TextField(
+                    style: const TextStyle(color: Colors.black87),
+                    decoration: const InputDecoration(
+                      hintText: 'Cari alat',
+                      hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                      prefixIcon: SizedBox(width: 8),
+                      suffixIcon: Icon(Icons.search, color: Colors.black54),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 14),
                     ),
-                    const SizedBox(height: 16),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: ['Monitor', 'Tools', 'Kabel', 'Tester'].map((
-                          cat,
-                        ) {
-                          final isActive = _selectedCategory == cat;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: ChoiceChip(
-                              label: Text(
-                                cat,
-                                style: TextStyle(
-                                  color: isActive
-                                      ? AppColors.black
-                                      : AppColors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              selected: isActive,
-                              onSelected: (selected) {
-                                if (selected) {
-                                  setState(() {
-                                    _selectedCategory = cat;
-                                  });
-                                }
-                              },
-                              selectedColor: const Color(0xFFE0E0F0),
-                              backgroundColor: AppColors.primaryDark,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(
-                                  color: isActive
-                                      ? Colors.transparent
-                                      : AppColors.primaryDark.withOpacity(0.5),
-                                ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.zero,
+                    children: ['Monitor', 'Tools', 'Kabel', 'Tester'].map((
+                      cat,
+                    ) {
+                      final isActive = _selectedCategory == cat;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedCategory = cat;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? const Color(0xFFD5CDF3)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isActive
+                                    ? const Color(0xFFD5CDF3)
+                                    : Colors.white54,
+                                width: 1.5,
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.65,
-                          ),
-                      itemCount: _alatList.length,
-                      itemBuilder: (context, index) {
-                        final alat = _alatList[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildPlaceholderImage(
-                                width: double.infinity,
-                                height: 120,
+                            child: Text(
+                              cat,
+                              style: TextStyle(
+                                color: isActive
+                                    ? const Color(0xFF1E1548)
+                                    : AppColors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
                               ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.65,
+                  ),
+                  itemCount: _alatList.length,
+                  itemBuilder: (context, index) {
+                    final alat = _alatList[index];
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildPlaceholderImage(
+                            width: double.infinity,
+                            height: 120,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            alat.nama.isEmpty
-                                                ? 'Title'
-                                                : alat.nama,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            alat.deskripsi.isEmpty
-                                                ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
-                                                : alat.deskripsi,
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              color: AppColors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () =>
-                                            _showAlatDetailModal(context, alat),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xFF1E1548,
-                                          ),
-                                          foregroundColor: AppColors.white,
-                                          minimumSize: const Size(
-                                            double.infinity,
-                                            36,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          padding: EdgeInsets.zero,
+                                      Text(
+                                        alat.nama.isEmpty ? 'Title' : alat.nama,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.black,
                                         ),
-                                        child: Text(
-                                          'Detail Alat',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        alat.deskripsi.isEmpty
+                                            ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
+                                            : alat.deskripsi,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.grey,
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        _showAlatDetailModal(context, alat),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF1E1548),
+                                      foregroundColor: AppColors.white,
+                                      minimumSize: const Size(
+                                        double.infinity,
+                                        36,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    child: Text(
+                                      'Detail Alat',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 80),
-                  ],
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
+                const SizedBox(height: 80),
+              ],
+            ),
+          );
   }
 
   Widget _buildHistoryView() {
@@ -773,10 +778,7 @@ class _UserDashboardState extends State<UserDashboard> {
           TextField(
             decoration: InputDecoration(
               hintText: 'Cari alat',
-              suffixIcon: const Icon(
-                Icons.search,
-                color: AppColors.black,
-              ),
+              suffixIcon: const Icon(Icons.search, color: AppColors.black),
               filled: true,
               fillColor: AppColors.white,
               border: OutlineInputBorder(
@@ -889,7 +891,9 @@ class _UserDashboardState extends State<UserDashboard> {
                       rightText,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: isBoldRight ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isBoldRight
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: AppColors.black,
                       ),
                     ),
@@ -931,10 +935,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 const SizedBox(height: 6),
                 const Text(
                   '224111006',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: AppColors.black,
-                  ),
+                  style: TextStyle(fontSize: 15, color: AppColors.black),
                 ),
               ],
             ),
@@ -1037,10 +1038,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 const SizedBox(width: 8),
                 const Text(
                   'Keluar',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -1153,7 +1151,7 @@ class _UserDashboardState extends State<UserDashboard> {
                   ),
                 );
               },
-              backgroundColor: const Color(0xFF1E1548),
+              backgroundColor: AppColors.primary,
               foregroundColor: AppColors.white,
               shape: const CircleBorder(),
               child: const Icon(Icons.qr_code_scanner, size: 28),

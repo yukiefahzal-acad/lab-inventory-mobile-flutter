@@ -20,6 +20,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
+  @override
+  void dispose() {
+    _usernameCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _login() async {
     if (_usernameCtrl.text.isEmpty || _passwordCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,8 +80,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.gradientStart,
-              AppColors.gradientEnd,
+              Color(0xFF1A1245), // Deep dark indigo purple top
+              Color(0xFFD5CDF3), // Soft lilac lavender bottom
             ],
           ),
         ),
@@ -86,10 +93,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 vertical: 16.0,
               ),
               child: Card(
-                elevation: 8,
-                shadowColor: Colors.black.withOpacity(0.12),
+                elevation: 12,
+                shadowColor: Colors.black.withValues(alpha: 0.15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 color: AppColors.white,
                 child: Padding(
@@ -101,59 +108,86 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Customizable Logo asset with fallbacks
                       Image.asset(
-                        '/images/logo_unibi.png',
-                        height: 110,
+                        'assets/images/logo_unibi.png',
+                        height: 120,
                         fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            '/images/logo_unibi.png',
+                            height: 120,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.handyman_outlined,
+                                color: AppColors.primary,
+                                size: 80,
+                              );
+                            },
+                          );
+                        },
                       ),
                       const SizedBox(height: 20),
+
+                      // Two-line center header subtitle
                       const Text(
                         'Sistem Peminjaman Alat\nLaboratorium Komputer',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryDark,
-                          height: 1.3,
+                          color: AppColors.primary,
+                          height: 1.35,
                         ),
                       ),
                       const SizedBox(height: 28),
+
+                      // Email Input Field (Omitted floating label for hintText inner styling)
                       TextField(
                         controller: _usernameCtrl,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
-                            Icons.email_outlined,
+                            Icons.mail_outline,
                             color: AppColors.primary,
                           ),
-                          labelText: 'E-Mail',
-                          hintText: 'Masukkan e-mail Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'E-Mail',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // Password Input Field
                       TextField(
                         controller: _passwordCtrl,
                         obscureText: _obscurePassword,
@@ -175,34 +209,42 @@ class _LoginScreenState extends State<LoginScreen> {
                               });
                             },
                           ),
-                          labelText: 'Password',
-                          hintText: 'Masukkan password Anda',
-                          labelStyle: const TextStyle(color: AppColors.primary),
-                          hintStyle: const TextStyle(color: AppColors.grey),
+                          hintText: 'Password',
+                          hintStyle: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: AppColors.primary,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
-                              width: 2,
+                              width: 1.8,
                             ),
                           ),
                           filled: true,
                           fillColor: AppColors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 14),
+
+                      // Remember me Checkbox aligned
                       Row(
                         children: [
                           SizedBox(
@@ -215,7 +257,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _rememberMe = val ?? false;
                                 });
                               },
-                              activeColor: AppColors.primary,
+                              activeColor: const Color(0xFF1E1548),
+                              checkColor: Colors.white,
+                              side: const BorderSide(
+                                color: Color(0xFF1E1548),
+                                width: 2,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -225,14 +272,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text(
                             'Ingat Saya',
                             style: TextStyle(
-                              color: AppColors.primaryDark,
-                              fontWeight: FontWeight.w500,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 28),
+
+                      // Loading spinner or rounded indigo button
                       _isLoading
                           ? const Center(
                               child: CircularProgressIndicator(
@@ -243,10 +292,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             )
                           : Container(
                               decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.3),
-                                    blurRadius: 10,
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 6,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
@@ -254,10 +304,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: _login,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
+                                  backgroundColor: const Color(0xFF1E1548),
                                   foregroundColor: AppColors.white,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
@@ -269,12 +319,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.0,
                                   ),
                                 ),
                               ),
                             ),
                       const SizedBox(height: 20),
+
+                      // Bottom Register link button
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).push(

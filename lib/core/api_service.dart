@@ -55,6 +55,20 @@ class ApiService {
       );
     }
     
+    if (endpoint == 'api/admin/peminjaman' && method == 'GET') {
+      return ApiResponse(
+        status: 'success',
+        message: 'Peminjaman fetched (Simulation)',
+        data: [
+          {'id': 1, 'user_id': 1, 'alat_id': 1, 'tanggal_pinjam': '01/05/2026', 'tanggal_kembali': '05/05/2026', 'status': 'denda'},
+          {'id': 2, 'user_id': 2, 'alat_id': 2, 'tanggal_pinjam': '10/05/2026', 'tanggal_kembali': '15/05/2026', 'status': 'lunas'},
+          {'id': 3, 'user_id': 3, 'alat_id': 1, 'tanggal_pinjam': '20/05/2026', 'tanggal_kembali': '25/05/2026', 'status': 'active'},
+          {'id': 4, 'user_id': 4, 'alat_id': 2, 'tanggal_pinjam': '28/05/2026', 'tanggal_kembali': '02/06/2026', 'status': 'pending'},
+          {'id': 5, 'user_id': 5, 'alat_id': 1, 'tanggal_pinjam': '01/04/2026', 'tanggal_kembali': '05/04/2026', 'status': 'returned'},
+        ],
+      );
+    }
+
     if (endpoint == 'api/admin/denda' && method == 'GET') {
       return ApiResponse(
         status: 'success',

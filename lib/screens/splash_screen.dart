@@ -11,7 +11,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -24,13 +25,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       duration: const Duration(milliseconds: 1500),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _controller.forward();
     _checkSession();
@@ -53,14 +56,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     if (token != null && token.isNotEmpty) {
       if (role == 'admin') {
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const AdminDashboard()));
+          MaterialPageRoute(builder: (_) => const AdminDashboard()),
+        );
       } else {
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const UserDashboard()));
+          MaterialPageRoute(builder: (_) => const UserDashboard()),
+        );
       }
     } else {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()));
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
     }
   }
 
@@ -82,8 +88,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.15),
-                    Colors.black.withOpacity(0.35),
+                    Colors.black.withValues(alpha: 0.15),
+                    Colors.black.withValues(alpha: 0.35),
                   ],
                 ),
               ),
@@ -108,12 +114,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         shadows: [
                           Shadow(
                             blurRadius: 8.0,
-                            color: Colors.purpleAccent.withOpacity(0.8),
+                            color: Colors.purpleAccent.withValues(alpha: 0.8),
                             offset: const Offset(0, 0),
                           ),
                           Shadow(
                             blurRadius: 20.0,
-                            color: Colors.deepPurple.withOpacity(0.9),
+                            color: Colors.deepPurple.withValues(alpha: 0.9),
                             offset: const Offset(0, 0),
                           ),
                         ],
@@ -138,7 +144,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       child: LinearProgressIndicator(
                         backgroundColor: Colors.white12,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.purpleAccent),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.purpleAccent,
+                        ),
                         minHeight: 4,
                       ),
                     ),
@@ -148,7 +156,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     'Sistem Peminjaman Alat Laboratorium',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       fontSize: 12,
                       letterSpacing: 1.0,
                     ),

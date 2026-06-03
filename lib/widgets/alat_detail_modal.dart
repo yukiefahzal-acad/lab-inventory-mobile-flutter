@@ -37,24 +37,31 @@ class AlatDetailModal {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: AppColors.grey.withOpacity(0.3),
+                        color: AppColors.grey.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  
+
                   // Gallery Carousel Placeholder
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      _buildPlaceholderImage(width: double.infinity, height: 160),
+                      _buildPlaceholderImage(
+                        width: double.infinity,
+                        height: 160,
+                      ),
                       Positioned(
                         left: 10,
                         child: CircleAvatar(
-                          backgroundColor: Colors.white.withOpacity(0.8),
+                          backgroundColor: Colors.white.withValues(alpha: 0.8),
                           radius: 18,
                           child: IconButton(
-                            icon: const Icon(Icons.chevron_left, color: AppColors.black, size: 18),
+                            icon: const Icon(
+                              Icons.chevron_left,
+                              color: AppColors.black,
+                              size: 18,
+                            ),
                             padding: EdgeInsets.zero,
                             onPressed: () {},
                           ),
@@ -63,10 +70,14 @@ class AlatDetailModal {
                       Positioned(
                         right: 10,
                         child: CircleAvatar(
-                          backgroundColor: Colors.white.withOpacity(0.8),
+                          backgroundColor: Colors.white.withValues(alpha: 0.8),
                           radius: 18,
                           child: IconButton(
-                            icon: const Icon(Icons.chevron_right, color: AppColors.black, size: 18),
+                            icon: const Icon(
+                              Icons.chevron_right,
+                              color: AppColors.black,
+                              size: 18,
+                            ),
                             padding: EdgeInsets.zero,
                             onPressed: () {},
                           ),
@@ -75,7 +86,7 @@ class AlatDetailModal {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Tool Name & Available Stock
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,9 +103,12 @@ class AlatDetailModal {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -109,7 +123,7 @@ class AlatDetailModal {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Tool Description
                   Text(
                     alat.deskripsi.isEmpty
@@ -118,7 +132,7 @@ class AlatDetailModal {
                     style: const TextStyle(fontSize: 14, color: AppColors.grey),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Tool Notes
                   const Text(
                     'Catatan alat:',
@@ -134,7 +148,7 @@ class AlatDetailModal {
                     style: TextStyle(fontSize: 14, color: AppColors.black),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Denda Rules Table
                   const Text(
                     'Ketentuan denda:',
@@ -151,7 +165,7 @@ class AlatDetailModal {
                   const SizedBox(height: 4),
                   _buildDendaRow('Denda hilang', 'Rp 500.000'),
                   const SizedBox(height: 20),
-                  
+
                   // Borrow Quantity Selector
                   const Text(
                     'Jumlah',
@@ -165,7 +179,11 @@ class AlatDetailModal {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.remove_circle_outline, color: AppColors.primary, size: 32),
+                        icon: const Icon(
+                          Icons.remove_circle_outline,
+                          color: AppColors.primary,
+                          size: 32,
+                        ),
                         onPressed: () {
                           if (quantity > 1) {
                             setModalState(() {
@@ -180,7 +198,9 @@ class AlatDetailModal {
                         height: 40,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.grey.withOpacity(0.5)),
+                          border: Border.all(
+                            color: AppColors.grey.withValues(alpha: 0.5),
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -194,7 +214,11 @@ class AlatDetailModal {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: AppColors.primary, size: 32),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primary,
+                          size: 32,
+                        ),
                         onPressed: () {
                           setModalState(() {
                             quantity++;
@@ -204,7 +228,7 @@ class AlatDetailModal {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Action Button
                   ElevatedButton(
                     onPressed: () {
@@ -230,7 +254,10 @@ class AlatDetailModal {
     );
   }
 
-  static Widget _buildPlaceholderImage({double width = 80, double height = 80}) {
+  static Widget _buildPlaceholderImage({
+    double width = 80,
+    double height = 80,
+  }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -261,8 +288,18 @@ class AlatDetailModal {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, color: AppColors.grey)),
-        Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.black)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, color: AppColors.grey),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.black,
+          ),
+        ),
       ],
     );
   }
