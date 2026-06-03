@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/api_service.dart';
 import '../../core/app_colors.dart';
 import '../../models/models.dart';
@@ -918,22 +919,22 @@ class _QRDetailModalState extends State<_QRDetailModal> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 12, 16, 0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const Text(
-                      'Scan QR',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
+                // child: Row(
+                //   children: [
+                //     IconButton(
+                //       icon: const Icon(Icons.arrow_back, color: Colors.black),
+                //       onPressed: () => Navigator.pop(context),
+                //     ),
+                //     const Text(
+                //       'Scan QR',
+                //       style: TextStyle(
+                //         fontSize: 18,
+                //         fontWeight: FontWeight.bold,
+                //         color: Colors.black,
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ),
               Expanded(
                 child: SingleChildScrollView(
