@@ -128,7 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(
                                 Icons.handyman_outlined,
-                                color: AppColors.primary,
+                                color: AppColors.primaryDark,
                                 size: 70,
                               );
                             },
@@ -144,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: AppColors.primaryDark,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -167,30 +167,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.person_outline,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           hintText: 'Nama',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -211,30 +211,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.badge_outlined,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           hintText: 'NIM',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -255,30 +255,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.mail_outline,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           hintText: 'Konfirmasi E-Mail',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -299,14 +299,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.vpn_key_outlined,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                             onPressed: () {
                               setState(() {
@@ -316,26 +316,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           hintText: 'Password',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -356,14 +356,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.vpn_key_outlined,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscureConfirmPassword
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                             onPressed: () {
                               setState(() {
@@ -374,26 +374,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           hintText: 'Konfirmasi Password',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -433,7 +433,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 onPressed: _register,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.authBgTop,
-                                  foregroundColor: AppColors.white,
+                                  foregroundColor: AppColors.textPrimary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -472,7 +472,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: const Text(
                               'Masuk di sini',
                               style: TextStyle(
-                                color: AppColors.primary,
+                                color: AppColors.primaryDark,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),

@@ -197,9 +197,9 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   Widget _buildBadge(String visualStatus) {
     switch (visualStatus) {
       case 'denda':
-        return _badge('Denda', AppColors.errorLight, AppColors.error);
+        return _badge('Denda', AppColors.errorBg, AppColors.error);
       case 'lunas':
-        return _badge('Lunas', AppColors.successLight, AppColors.successDark);
+        return _badge('Lunas', AppColors.successBg, AppColors.successDark);
       case 'aktif':
         return _badge('Aktif', AppColors.primary, AppColors.white);
       case 'belum_verifikasi':
@@ -209,7 +209,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
           AppColors.warning,
         );
       default:
-        return _badge('Selesai', AppColors.successLight, AppColors.successDark);
+        return _badge('Selesai', AppColors.successBg, AppColors.successDark);
     }
   }
 
@@ -370,12 +370,15 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
               ? const Center(
                   child: Text(
                     'Tidak ada data peminjaman.',
-                    style: TextStyle(color: AppColors.white70, fontSize: 16),
+                    style: TextStyle(
+                      color: AppColors.primaryDark,
+                      fontSize: 16,
+                    ),
                   ),
                 )
               : RefreshIndicator(
                   onRefresh: _fetchData,
-                  color: AppColors.primary,
+                  color: AppColors.primaryDark,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
@@ -677,7 +680,7 @@ class _DendaModal extends StatelessWidget {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.errorLight,
+                                    color: AppColors.errorBg,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Text(
@@ -787,7 +790,7 @@ class _DendaModal extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: onLunas,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.successMain,
+                              backgroundColor: AppColors.success,
                               foregroundColor: AppColors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
@@ -1026,7 +1029,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: _dendaRusak
-                                        ? AppColors.errorLight
+                                        ? AppColors.errorBg
                                         : AppColors.errorBg,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -1051,7 +1054,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: _dendaTelat
-                                        ? AppColors.errorLight
+                                        ? AppColors.errorBg
                                         : AppColors.errorBg,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -1151,7 +1154,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                             onPressed: widget.onVerifikasi,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isKembali
-                                  ? AppColors.warningMain
+                                  ? AppColors.warning
                                   : AppColors.warningDark,
                               foregroundColor: AppColors.white,
                               elevation: 0,

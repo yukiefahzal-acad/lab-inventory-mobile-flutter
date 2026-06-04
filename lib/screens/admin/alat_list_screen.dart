@@ -205,10 +205,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
               padding: const EdgeInsets.only(top: 80.0),
               child: Text(
                 'Tidak ada alat ditemukan.',
-                style: TextStyle(
-                  color: AppColors.white.withValues(alpha: 0.7),
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: AppColors.primaryDark, fontSize: 16),
               ),
             ),
           )
@@ -347,12 +344,8 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                           side: const BorderSide(
                                             color: AppColors.errorBg,
                                           ),
-                                          backgroundColor: const Color(
-                                            0xFFFDE8E8,
-                                          ),
-                                          foregroundColor: const Color(
-                                            0xFFC53030,
-                                          ),
+                                          backgroundColor: AppColors.errorBg,
+                                          foregroundColor: AppColors.error,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               8,
@@ -385,9 +378,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                           _fetchAlat();
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xFF1E1548,
-                                          ),
+                                          backgroundColor: AppColors.secondary,
                                           foregroundColor: AppColors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -427,7 +418,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
         ).push(MaterialPageRoute(builder: (_) => const AlatFormScreen()));
         _fetchAlat();
       },
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.secondary,
       foregroundColor: AppColors.white,
       shape: const CircleBorder(),
       child: const Icon(Icons.add, size: 28),
@@ -438,7 +429,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
         backgroundColor: AppColors.darkSurface,
         body: RefreshIndicator(
           onRefresh: _fetchAlat,
-          color: AppColors.primary,
+          color: AppColors.primaryDark,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(children: [searchAndFilterHeader, gridContent]),
@@ -458,7 +449,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _fetchAlat,
-        color: AppColors.primary,
+        color: AppColors.primaryDark,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(children: [searchAndFilterHeader, gridContent]),

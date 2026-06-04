@@ -115,7 +115,7 @@ class _DendaListScreenState extends State<DendaListScreen> {
                           onPressed: () => _updateStatusLunas(denda.id!),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            foregroundColor: AppColors.white,
+                            foregroundColor: AppColors.textPrimary,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),

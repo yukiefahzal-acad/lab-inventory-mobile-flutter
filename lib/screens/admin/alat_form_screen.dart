@@ -119,10 +119,10 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       onTap: _pickImage,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppColors.primaryLight,
+            color: AppColors.secondaryLight,
             style: BorderStyle.solid, // Dash approximation
             width: 1.5,
           ),
@@ -131,8 +131,8 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
           child: CircleAvatar(
             radius: 20,
             backgroundColor: isActive
-                ? AppColors.authBgTop
-                : AppColors.authBgBottom,
+                ? AppColors.secondary
+                : AppColors.secondaryLight,
             child: const Icon(Icons.add, color: AppColors.white, size: 20),
           ),
         ),
@@ -168,19 +168,19 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       hintText: hintText,
       hintStyle: const TextStyle(color: AppColors.black54, fontSize: 14),
       filled: true,
-      fillColor: AppColors.backgroundDefault,
+      fillColor: AppColors.white,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.black38),
+        borderSide: const BorderSide(color: AppColors.secondaryLight),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.black38),
+        borderSide: const BorderSide(color: AppColors.secondaryLight),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.authBgTop, width: 1.8),
+        borderSide: const BorderSide(color: AppColors.secondary, width: 2.0),
       ),
     );
   }
@@ -189,7 +189,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.alat != null;
     return Scaffold(
-      backgroundColor: AppColors.surfaceLightest,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         title: Text(isEditing ? 'Ubah Data Alat' : 'Input Data Alat'),
         backgroundColor: AppColors.white,
@@ -267,9 +267,9 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundDefault,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.black38),
+                  border: Border.all(color: AppColors.secondaryLight),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,13 +282,13 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLightest,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
                             'Kategori 1',
                             style: TextStyle(
-                              color: AppColors.authBgTop,
+                              color: AppColors.secondary,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -301,13 +301,13 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLightest,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
                             'Kategori 2',
                             style: TextStyle(
-                              color: AppColors.authBgTop,
+                              color: AppColors.secondary,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -378,13 +378,13 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               _isLoading
                   ? const Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                        color: AppColors.primaryDark,
                       ),
                     )
                   : ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.authBgTop,
+                        backgroundColor: AppColors.secondary,
                         foregroundColor: AppColors.white,
                         minimumSize: const Size(double.infinity, 54),
                         shape: RoundedRectangleBorder(

@@ -210,7 +210,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -226,7 +226,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -262,8 +262,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   label: 'Total Denda',
                   value: 'Rp 10.000',
                   icon: Icons.report_problem_outlined,
-                  iconColor: AppColors.errorMain,
-                  textColor: AppColors.errorMain,
+                  iconColor: AppColors.error,
+                  textColor: AppColors.error,
                 ),
               ],
             ),
@@ -279,7 +279,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               GestureDetector(
@@ -290,12 +290,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       'Lihat semua',
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.white.withValues(alpha: 0.7),
+                        color: AppColors.primaryDark,
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.white.withValues(alpha: 0.7),
+                      color: AppColors.primaryDark,
                       size: 16,
                     ),
                   ],
@@ -318,7 +318,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   borrowDate: 'DD/MM/YYYY',
                   dueDate: 'DD/MM/YYYY',
                   status: 'Selesai',
-                  statusTextColor: AppColors.successDarkest,
+                  statusTextColor: AppColors.successDark,
                   statusBgColor: AppColors.successBg,
                 ),
                 const Divider(height: 1),
@@ -328,7 +328,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   borrowDate: 'DD/MM/YYYY',
                   dueDate: 'DD/MM/YYYY',
                   status: 'Aktif',
-                  statusTextColor: AppColors.white,
+                  statusTextColor: AppColors.textPrimary,
                   statusBgColor: AppColors.primary,
                 ),
                 const Divider(height: 1),
@@ -352,7 +352,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -399,7 +399,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.errorMain,
+                        color: AppColors.error,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -606,7 +606,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         },
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppColors.white,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.grey,
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.bold,

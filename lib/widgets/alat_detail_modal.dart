@@ -112,7 +112,7 @@ class AlatDetailModal {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: AppColors.primaryDark.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -120,7 +120,7 @@ class AlatDetailModal {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                         ),
                       ),
@@ -185,7 +185,7 @@ class AlatDetailModal {
                       IconButton(
                         icon: const Icon(
                           Icons.remove_circle_outline,
-                          color: AppColors.primary,
+                          color: AppColors.primaryDark,
                           size: 32,
                         ),
                         onPressed: () {
@@ -220,7 +220,7 @@ class AlatDetailModal {
                       IconButton(
                         icon: const Icon(
                           Icons.add_circle_outline,
-                          color: AppColors.primary,
+                          color: AppColors.primaryDark,
                           size: 32,
                         ),
                         onPressed: () {
@@ -241,7 +241,7 @@ class AlatDetailModal {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
+                      foregroundColor: AppColors.textPrimary,
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

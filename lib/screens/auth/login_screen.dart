@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(
                                 Icons.handyman_outlined,
-                                color: AppColors.primary,
+                                color: AppColors.primaryDark,
                                 size: 80,
                               );
                             },
@@ -125,12 +125,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Two-line center header subtitle
                       const Text(
-                        'Sistem Peminjaman Alat\nLaboratorium Komputer',
+                        'Sistem Peminjaman Alat Laboratorium Komputer',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                          color: AppColors.primaryDark,
                           height: 1.35,
                         ),
                       ),
@@ -143,30 +143,30 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.mail_outline,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           hintText: 'E-Mail',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -187,14 +187,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.vpn_key_outlined,
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                             onPressed: () {
                               setState(() {
@@ -204,26 +204,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           hintText: 'Password',
                           hintStyle: const TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               width: 1.8,
                             ),
                           ),
@@ -265,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text(
                             'Ingat Saya',
                             style: TextStyle(
-                              color: AppColors.primary,
+                              color: AppColors.primaryDark,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -300,7 +300,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: _login,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.authBgTop,
-                                  foregroundColor: AppColors.white,
+                                  foregroundColor: AppColors.textPrimary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -332,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           'Daftar Sekarang',
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.primaryDark,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),

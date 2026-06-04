@@ -2,36 +2,34 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Brand / Theme Colors
-  static const Color primary = Color(0xFF6558A5);
-  static const Color primaryDark = Color(0xFF4C457A);
+  static const Color primary = Color(0xFFAEE2FF); // Light blue
+  static const Color secondary = Color(0xFF9FA1FF); // Purple-blue
+  static const Color secondaryLight = Color(0xFFB5BAFF); // Light Purple-blue
+  static const Color accentGreen = Color(0xFFD9F9DF); // Light green
+
+  static const Color primaryDark = Color(
+    0xFF1E88E5,
+  ); // Darker blue for text/icons on white bg
   static const Color primaryLight = Color(0xFFC4BCE6);
   static const Color primaryLightest = Color(0xFFEBE8F6);
 
   // Gradient Colors for Auth Screens
-  static const Color gradientStart = Color(0xFF8672C8);
-  static const Color gradientEnd = Color(0xFFD4C9F7);
-  static const Color authBgTop = Color(0xFF1A1245);
-  static const Color authBgBottom = Color(0xFFD5CDF3);
+  static const Color authBgTop = Color(0xFFAEE2FF);
+  static const Color authBgBottom = Color(0xFF9FA1FF);
 
   // Status & Feedback Colors
   // Error
-  static const Color error = Color(0xFFC53030);
+  static const Color error = Color(0xFFEF4444);
   static const Color errorBg = Color(0xFFFDE8E8);
-  static const Color errorMain = Color(0xFFEF4444);
   static const Color errorDark = Color(0xFF9B1C1C);
-  static const Color errorLight = Color(0xFFFFE0E0);
 
   // Success
   static const Color success = Color(0xFF10B981); // Emerald Green modern
   static const Color successBg = Color(0xFFDEF7EC);
-  static const Color successMain = Color(0xFF22C55E);
   static const Color successDark = Color(0xFF059669);
-  static const Color successDarkest = Color(0xFF03543F);
-  static const Color successLight = Color(0xFFD1FAE5);
 
   // Warning
   static const Color warning = Color(0xFFD97706);
-  static const Color warningMain = Color(0xFFD4AA70);
   static const Color warningBg = Color(0xFFFEF3C7);
   static const Color warningDark = Color(0xFF8B6914);
 
@@ -41,7 +39,12 @@ class AppColors {
   static const Color surfaceLightest = Color(0xFFF9F7FD);
   static const Color backgroundDefault = Color(0xFFFCFAFF);
 
-  // Core Neutrals
+  // Text & Core Neutrals
+  static const Color textPrimary = Color(
+    0xFF1E293B,
+  ); // Dark slate for high contrast on light blue
+  static const Color textSecondary = Color(0xFF64748B); // Lighter slate
+
   static const Color white = Color(0xFFFFFFFF);
   static const Color white12 = Color(0x1FFFFFFF);
   static const Color white54 = Color(0x8AFFFFFF);

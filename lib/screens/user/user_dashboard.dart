@@ -164,7 +164,7 @@ class _UserDashboardState extends State<UserDashboard> {
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -181,7 +181,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               GestureDetector(
@@ -196,12 +196,12 @@ class _UserDashboardState extends State<UserDashboard> {
                       'Lihat semua',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.white.withValues(alpha: 0.7),
+                        color: AppColors.primaryDark,
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.white.withValues(alpha: 0.7),
+                      color: AppColors.primaryDark,
                       size: 18,
                     ),
                   ],
@@ -330,7 +330,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               GestureDetector(
@@ -345,12 +345,12 @@ class _UserDashboardState extends State<UserDashboard> {
                       'Lihat semua',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.white.withValues(alpha: 0.7),
+                        color: AppColors.primaryDark,
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.white.withValues(alpha: 0.7),
+                      color: AppColors.primaryDark,
                       size: 18,
                     ),
                   ],
@@ -402,7 +402,7 @@ class _UserDashboardState extends State<UserDashboard> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -644,12 +644,12 @@ class _UserDashboardState extends State<UserDashboard> {
                             ),
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? AppColors.authBgBottom
+                                  ? AppColors.secondary
                                   : AppColors.transparent,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: isActive
-                                    ? AppColors.authBgBottom
+                                    ? AppColors.secondary
                                     : AppColors.white54,
                                 width: 1.5,
                               ),
@@ -658,8 +658,8 @@ class _UserDashboardState extends State<UserDashboard> {
                               cat,
                               style: TextStyle(
                                 color: isActive
-                                    ? AppColors.authBgTop
-                                    : AppColors.white,
+                                    ? AppColors.white
+                                    : AppColors.textPrimary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                               ),
@@ -736,7 +736,7 @@ class _UserDashboardState extends State<UserDashboard> {
                                         _showAlatDetailModal(context, alat),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.authBgTop,
-                                      foregroundColor: AppColors.white,
+                                      foregroundColor: AppColors.textPrimary,
                                       minimumSize: const Size(
                                         double.infinity,
                                         36,
@@ -845,7 +845,7 @@ class _UserDashboardState extends State<UserDashboard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.greyLightest,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -1151,7 +1151,7 @@ class _UserDashboardState extends State<UserDashboard> {
                   ),
                 );
               },
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.secondary,
               foregroundColor: AppColors.white,
               shape: const CircleBorder(),
               child: const Icon(Icons.qr_code_scanner, size: 28),
