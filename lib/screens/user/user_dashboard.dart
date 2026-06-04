@@ -179,31 +179,38 @@ class _UserDashboardState extends State<UserDashboard> {
               const Text(
                 'Status Pinjaman Aktif',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
+              TextButton(
+                onPressed: () {
                   setState(() {
                     _currentIndex = 2;
                   });
                 },
-                child: Row(
+                style: TextButton.styleFrom(
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.secondary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Row(
                   children: [
                     Text(
                       'Lihat semua',
                       style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: AppColors.primaryDark,
-                      size: 18,
-                    ),
+                    Icon(Icons.chevron_right, size: 16),
                   ],
                 ),
               ),
@@ -333,26 +340,33 @@ class _UserDashboardState extends State<UserDashboard> {
                   color: AppColors.textPrimary,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
+              TextButton(
+                onPressed: () {
                   setState(() {
                     _currentIndex = 2;
                   });
                 },
-                child: Row(
+                style: TextButton.styleFrom(
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.secondary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Row(
                   children: [
                     Text(
                       'Lihat semua',
                       style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: AppColors.primaryDark,
-                      size: 18,
-                    ),
+                    Icon(Icons.chevron_right, size: 16),
                   ],
                 ),
               ),
@@ -1166,7 +1180,7 @@ class _UserDashboardState extends State<UserDashboard> {
         },
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppColors.white,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.grey,
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.bold,

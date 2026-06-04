@@ -282,22 +282,29 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   color: AppColors.textPrimary,
                 ),
               ),
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 2),
-                child: Row(
+              TextButton(
+                onPressed: () => setState(() => _currentIndex = 2),
+                style: TextButton.styleFrom(
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.secondary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Row(
                   children: [
                     Text(
                       'Lihat semua',
                       style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.primaryDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: AppColors.primaryDark,
-                      size: 16,
-                    ),
+                    Icon(Icons.chevron_right, size: 16),
                   ],
                 ),
               ),
