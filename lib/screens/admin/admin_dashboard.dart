@@ -31,7 +31,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Container(
         width: width,
         height: height,
-        color: Colors.grey.shade100,
+        color: AppColors.grey100,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -44,7 +44,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             final col = index % 8;
             final isEven = (row + col) % 2 == 0;
             return Container(
-              color: isEven ? Colors.white : Colors.grey.shade300,
+              color: isEven ? AppColors.white : AppColors.grey300,
             );
           },
         ),
@@ -57,7 +57,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Container(
         width: radius * 2,
         height: radius * 2,
-        color: Colors.grey.shade100,
+        color: AppColors.grey100,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -70,7 +70,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             final col = index % 8;
             final isEven = (row + col) % 2 == 0;
             return Container(
-              color: isEven ? Colors.white : Colors.grey.shade300,
+              color: isEven ? AppColors.white : AppColors.grey300,
             );
           },
         ),
@@ -90,11 +90,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       height: 145,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppColors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -114,7 +114,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: textColor == Colors.black ? Colors.black54 : textColor,
+              color: textColor == AppColors.black
+                  ? AppColors.black54
+                  : textColor,
             ),
           ),
           Text(
@@ -155,23 +157,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: AppColors.black,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   name,
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 13, color: AppColors.grey600),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Dipinjam: $borrowDate',
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 11, color: AppColors.grey600),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Jatuh tempo: $dueDate',
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 11, color: AppColors.grey600),
                 ),
               ],
             ),
@@ -236,32 +238,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   label: 'Total Alat',
                   value: '43',
                   icon: Icons.inventory_2_outlined,
-                  iconColor: const Color(0xFF6558A5),
-                  textColor: Colors.black,
+                  iconColor: AppColors.primary,
+                  textColor: AppColors.black,
                 ),
                 const SizedBox(width: 10),
                 _buildStatCard(
                   label: 'Pinjaman',
                   value: '12',
                   icon: Icons.outbox,
-                  iconColor: const Color(0xFF10B981),
-                  textColor: const Color(0xFF10B981),
+                  iconColor: AppColors.success,
+                  textColor: AppColors.success,
                 ),
                 const SizedBox(width: 10),
                 _buildStatCard(
                   label: 'Pengembalian',
                   value: '2',
                   icon: Icons.move_to_inbox,
-                  iconColor: const Color(0xFFD97706),
-                  textColor: const Color(0xFFD97706),
+                  iconColor: AppColors.warning,
+                  textColor: AppColors.warning,
                 ),
                 const SizedBox(width: 10),
                 _buildStatCard(
                   label: 'Total Denda',
                   value: 'Rp 10.000',
                   icon: Icons.report_problem_outlined,
-                  iconColor: const Color(0xFFEF4444),
-                  textColor: const Color(0xFFEF4444),
+                  iconColor: AppColors.errorMain,
+                  textColor: AppColors.errorMain,
                 ),
               ],
             ),
@@ -305,7 +307,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -316,8 +318,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   borrowDate: 'DD/MM/YYYY',
                   dueDate: 'DD/MM/YYYY',
                   status: 'Selesai',
-                  statusTextColor: const Color(0xFF03543F),
-                  statusBgColor: const Color(0xFFDEF7EC),
+                  statusTextColor: AppColors.successDarkest,
+                  statusBgColor: AppColors.successBg,
                 ),
                 const Divider(height: 1),
                 _buildActiveLoanItem(
@@ -326,8 +328,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   borrowDate: 'DD/MM/YYYY',
                   dueDate: 'DD/MM/YYYY',
                   status: 'Aktif',
-                  statusTextColor: Colors.white,
-                  statusBgColor: const Color(0xFF6558A5),
+                  statusTextColor: AppColors.white,
+                  statusBgColor: AppColors.primary,
                 ),
                 const Divider(height: 1),
                 _buildActiveLoanItem(
@@ -336,8 +338,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   borrowDate: 'DD/MM/YYYY',
                   dueDate: 'DD/MM/YYYY',
                   status: 'Denda',
-                  statusTextColor: const Color(0xFF9B1C1C),
-                  statusBgColor: const Color(0xFFFDE8E8),
+                  statusTextColor: AppColors.errorDark,
+                  statusBgColor: AppColors.errorBg,
                 ),
               ],
             ),
@@ -357,7 +359,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -373,18 +375,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
                       ),
                       const SizedBox(height: 3),
                       const Text(
                         'Kode: UNI-000',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                        style: TextStyle(fontSize: 11, color: AppColors.grey),
                       ),
                       const SizedBox(height: 2),
                       const Text(
                         'Terlambat: X Hari',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                        style: TextStyle(fontSize: 11, color: AppColors.grey),
                       ),
                     ],
                   ),
@@ -397,7 +399,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFEF4444),
+                        color: AppColors.errorMain,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -407,7 +409,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFDE8E8),
+                        color: AppColors.errorBg,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
@@ -415,7 +417,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF9B1C1C),
+                          color: AppColors.errorDark,
                         ),
                       ),
                     ),
@@ -440,7 +442,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -452,7 +454,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E1548),
+                    color: AppColors.authBgTop,
                   ),
                 ),
               ],
@@ -465,18 +467,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               children: [
-                const Icon(Icons.mail_outline, color: Colors.black, size: 24),
+                const Icon(
+                  Icons.mail_outline,
+                  color: AppColors.black,
+                  size: 24,
+                ),
                 const SizedBox(width: 16),
                 const Text(
                   'admin@mail.com',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: AppColors.black,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -489,8 +495,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ElevatedButton(
             onPressed: _logout,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC53030),
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -504,7 +510,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   scaleX: -1,
                   child: const Icon(
                     Icons.logout,
-                    color: Colors.white,
+                    color: AppColors.white,
                     size: 20,
                   ),
                 ),

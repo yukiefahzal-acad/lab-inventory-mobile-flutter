@@ -18,7 +18,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
   late final TextEditingController _namaCtrl;
   late final TextEditingController _deskripsiCtrl;
   late final TextEditingController _statusAwalCtrl;
-  
+
   // New fields matching the mockup:
   late final TextEditingController _stokCtrl;
   late final TextEditingController _dendaPerHariCtrl;
@@ -35,13 +35,21 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
     final a = widget.alat;
     _namaCtrl = TextEditingController(text: a?.nama ?? '');
     _deskripsiCtrl = TextEditingController(text: a?.deskripsi ?? '');
-    _statusAwalCtrl = TextEditingController(text: a?.statusAwal ?? 'Indikasi Aman Pengiriman');
-    
+    _statusAwalCtrl = TextEditingController(
+      text: a?.statusAwal ?? 'Indikasi Aman Pengiriman',
+    );
+
     // Fallbacks or actual values if loaded
     _stokCtrl = TextEditingController(text: a != null ? '20' : '20');
-    _dendaPerHariCtrl = TextEditingController(text: a != null ? 'Rp 10.000' : 'Rp 10.000');
-    _dendaRusakCtrl = TextEditingController(text: a != null ? 'Rp 100.000' : 'Rp 100.000');
-    _dendaHilangCtrl = TextEditingController(text: a != null ? 'Rp 500.000' : 'Rp 500.000');
+    _dendaPerHariCtrl = TextEditingController(
+      text: a != null ? 'Rp 10.000' : 'Rp 10.000',
+    );
+    _dendaRusakCtrl = TextEditingController(
+      text: a != null ? 'Rp 100.000' : 'Rp 100.000',
+    );
+    _dendaHilangCtrl = TextEditingController(
+      text: a != null ? 'Rp 500.000' : 'Rp 500.000',
+    );
   }
 
   @override
@@ -73,7 +81,9 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       'nama': _namaCtrl.text,
       'deskripsi': _deskripsiCtrl.text,
       'status_awal': _statusAwalCtrl.text,
-      'foto_url': _imageFile != null ? 'uploaded_dummy_url' : widget.alat?.fotoUrl,
+      'foto_url': _imageFile != null
+          ? 'uploaded_dummy_url'
+          : widget.alat?.fotoUrl,
     };
 
     final ApiResponse<dynamic> res;
@@ -88,11 +98,19 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
     if (!mounted) return;
     if (res.status == 'success') {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.alat != null ? 'Alat berhasil diperbarui' : 'Alat berhasil ditambahkan')),
+        SnackBar(
+          content: Text(
+            widget.alat != null
+                ? 'Alat berhasil diperbarui'
+                : 'Alat berhasil ditambahkan',
+          ),
+        ),
       );
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(res.message)));
     }
   }
 
@@ -101,10 +119,10 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       onTap: _pickImage,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F1FA),
+          color: AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFFC4BCE6),
+            color: AppColors.primaryLight,
             style: BorderStyle.solid, // Dash approximation
             width: 1.5,
           ),
@@ -112,8 +130,10 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
         child: Center(
           child: CircleAvatar(
             radius: 20,
-            backgroundColor: isActive ? const Color(0xFF1E1548) : const Color(0xFFD5CDF3),
-            child: const Icon(Icons.add, color: Colors.white, size: 20),
+            backgroundColor: isActive
+                ? AppColors.authBgTop
+                : AppColors.authBgBottom,
+            child: const Icon(Icons.add, color: AppColors.white, size: 20),
           ),
         ),
       ),
@@ -130,7 +150,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            color: Colors.black87,
+            color: AppColors.black87,
           ),
         ),
       ),
@@ -142,23 +162,25 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
     IconData? prefixIcon,
   }) {
     return InputDecoration(
-      prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: const Color(0xFF1E1548)) : null,
+      prefixIcon: prefixIcon != null
+          ? Icon(prefixIcon, color: AppColors.authBgTop)
+          : null,
       hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.black54, fontSize: 14),
+      hintStyle: const TextStyle(color: AppColors.black54, fontSize: 14),
       filled: true,
-      fillColor: const Color(0xFFFCFAFF),
+      fillColor: AppColors.backgroundDefault,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.black38),
+        borderSide: const BorderSide(color: AppColors.black38),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.black38),
+        borderSide: const BorderSide(color: AppColors.black38),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF1E1548), width: 1.8),
+        borderSide: const BorderSide(color: AppColors.authBgTop, width: 1.8),
       ),
     );
   }
@@ -167,14 +189,14 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.alat != null;
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F7FD),
+      backgroundColor: AppColors.surfaceLightest,
       appBar: AppBar(
         title: Text(isEditing ? 'Ubah Data Alat' : 'Input Data Alat'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.white,
+        foregroundColor: AppColors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -206,11 +228,11 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               const Center(
                 child: Text(
                   'Upload Gambar Alat (Hingga 6 gambar, maksimum 5MB per gambar)',
-                  style: TextStyle(color: Colors.grey, fontSize: 11),
+                  style: TextStyle(color: AppColors.grey, fontSize: 11),
                 ),
               ),
               const SizedBox(height: 16),
-              const Divider(color: Colors.black12, thickness: 1),
+              const Divider(color: AppColors.black12, thickness: 1),
               const SizedBox(height: 8),
 
               // Identifikasi Alat
@@ -219,7 +241,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Colors.black,
+                  color: AppColors.black,
                 ),
               ),
               const SizedBox(height: 4),
@@ -227,23 +249,27 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               _buildFieldLabel('Judul Alat'),
               TextFormField(
                 controller: _namaCtrl,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: AppColors.black),
                 decoration: _buildInputDecoration(
                   hintText: 'Judul Alat',
                   prefixIcon: Icons.inventory_2_outlined,
                 ),
-                validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Wajib diisi' : null,
               ),
 
               _buildFieldLabel('Jenis Alat'),
               // Dropdown mock matching mockup category pills inside a dropdown container
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFCFAFF),
+                  color: AppColors.backgroundDefault,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black38),
+                  border: Border.all(color: AppColors.black38),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -251,31 +277,48 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEBE8F6),
+                            color: AppColors.primaryLightest,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
                             'Kategori 1',
-                            style: TextStyle(color: Color(0xFF1E1548), fontSize: 12, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: AppColors.authBgTop,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEBE8F6),
+                            color: AppColors.primaryLightest,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
                             'Kategori 2',
-                            style: TextStyle(color: Color(0xFF1E1548), fontSize: 12, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: AppColors.authBgTop,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.black54,
+                    ),
                   ],
                 ),
               ),
@@ -283,17 +326,15 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               _buildFieldLabel('Stok'),
               TextFormField(
                 controller: _stokCtrl,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: AppColors.black),
                 keyboardType: TextInputType.number,
-                decoration: _buildInputDecoration(
-                  hintText: '20',
-                ),
+                decoration: _buildInputDecoration(hintText: '20'),
               ),
 
               _buildFieldLabel('Denda Per Hari'),
               TextFormField(
                 controller: _dendaPerHariCtrl,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: AppColors.black),
                 decoration: _buildInputDecoration(
                   hintText: 'Rp 10.000',
                   prefixIcon: Icons.credit_card_outlined,
@@ -303,7 +344,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               _buildFieldLabel('Denda Rusak'),
               TextFormField(
                 controller: _dendaRusakCtrl,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: AppColors.black),
                 decoration: _buildInputDecoration(
                   hintText: 'Rp 100.000',
                   prefixIcon: Icons.credit_card_outlined,
@@ -313,7 +354,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               _buildFieldLabel('Denda Hilang'),
               TextFormField(
                 controller: _dendaHilangCtrl,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: AppColors.black),
                 decoration: _buildInputDecoration(
                   hintText: 'Rp 500.000',
                   prefixIcon: Icons.credit_card_outlined,
@@ -324,22 +365,27 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               TextFormField(
                 controller: _deskripsiCtrl,
                 maxLines: 4,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: AppColors.black),
                 decoration: _buildInputDecoration(
                   hintText: 'Deskripsi singkat alat',
                 ),
-                validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Wajib diisi' : null,
               ),
 
               const SizedBox(height: 24),
 
               _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
                   : ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1E1548),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.authBgTop,
+                        foregroundColor: AppColors.white,
                         minimumSize: const Size(double.infinity, 54),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -349,11 +395,17 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(isEditing ? Icons.save : Icons.add_box, size: 20),
+                          Icon(
+                            isEditing ? Icons.save : Icons.add_box,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             isEditing ? 'Simpan Perubahan' : 'Tambah',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),

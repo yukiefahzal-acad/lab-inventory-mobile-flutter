@@ -83,8 +83,8 @@ class _DendaListScreenState extends State<DendaListScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: widget.isTab
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.white,
+                      ? AppColors.white.withValues(alpha: 0.08)
+                      : AppColors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListTile(
@@ -107,9 +107,7 @@ class _DendaListScreenState extends State<DendaListScreen> {
                   subtitle: Text(
                     'Rp ${denda.jumlah} | Status: ${denda.status}',
                     style: TextStyle(
-                      color: widget.isTab
-                          ? AppColors.grey
-                          : Colors.grey.shade600,
+                      color: widget.isTab ? AppColors.grey : AppColors.grey600,
                     ),
                   ),
                   trailing: isUnpaid

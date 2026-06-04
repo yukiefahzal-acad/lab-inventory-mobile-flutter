@@ -90,14 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1A1245), // Deep dark indigo purple top
-              Color(0xFFD5CDF3), // Soft lilac lavender bottom
-            ],
-          ),
+          gradient: AppColors.authBackgroundGradient,
         ),
         child: SafeArea(
           child: Center(
@@ -108,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               child: Card(
                 elevation: 12,
-                shadowColor: Colors.black.withValues(alpha: 0.15),
+                shadowColor: AppColors.black.withValues(alpha: 0.15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -428,7 +421,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
+                                    color: AppColors.black.withValues(
+                                      alpha: 0.2,
+                                    ),
                                     blurRadius: 6,
                                     offset: const Offset(0, 4),
                                   ),
@@ -437,7 +432,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: ElevatedButton(
                                 onPressed: _register,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1E1548),
+                                  backgroundColor: AppColors.authBgTop,
                                   foregroundColor: AppColors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),

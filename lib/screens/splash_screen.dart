@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'auth/login_screen.dart';
 import 'admin/admin_dashboard.dart';
 import 'user/user_dashboard.dart';
+import 'package:project_uas/core/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,14 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.15),
-                    Colors.black.withValues(alpha: 0.35),
-                  ],
-                ),
+                gradient: AppColors.splashOverlayGradient,
               ),
             ),
           ),
@@ -107,19 +101,21 @@ class _SplashScreenState extends State<SplashScreen>
                     Text(
                       'UNIBI LAB',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 4.0,
                         shadows: [
                           Shadow(
                             blurRadius: 8.0,
-                            color: Colors.purpleAccent.withValues(alpha: 0.8),
+                            color: AppColors.purpleAccent.withValues(
+                              alpha: 0.8,
+                            ),
                             offset: const Offset(0, 0),
                           ),
                           Shadow(
                             blurRadius: 20.0,
-                            color: Colors.deepPurple.withValues(alpha: 0.9),
+                            color: AppColors.deepPurple.withValues(alpha: 0.9),
                             offset: const Offset(0, 0),
                           ),
                         ],
@@ -143,9 +139,9 @@ class _SplashScreenState extends State<SplashScreen>
                     child: ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       child: LinearProgressIndicator(
-                        backgroundColor: Colors.white12,
+                        backgroundColor: AppColors.white12,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.purpleAccent,
+                          AppColors.purpleAccent,
                         ),
                         minHeight: 4,
                       ),
@@ -156,7 +152,7 @@ class _SplashScreenState extends State<SplashScreen>
                     'Sistem Peminjaman Alat Laboratorium',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: AppColors.white.withValues(alpha: 0.6),
                       fontSize: 12,
                       letterSpacing: 1.0,
                     ),

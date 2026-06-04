@@ -115,7 +115,7 @@ class _UserDashboardState extends State<UserDashboard> {
       child: Container(
         width: width,
         height: height,
-        color: Colors.grey.shade100,
+        color: AppColors.grey100,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -128,7 +128,7 @@ class _UserDashboardState extends State<UserDashboard> {
             final col = index % 8;
             final isEven = (row + col) % 2 == 0;
             return Container(
-              color: isEven ? Colors.white : Colors.grey.shade300,
+              color: isEven ? AppColors.white : AppColors.grey300,
             );
           },
         ),
@@ -601,19 +601,19 @@ class _UserDashboardState extends State<UserDashboard> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: AppColors.black.withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
                     ],
                   ),
                   child: TextField(
-                    style: const TextStyle(color: Colors.black87),
+                    style: const TextStyle(color: AppColors.black87),
                     decoration: const InputDecoration(
                       hintText: 'Cari alat',
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                      hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
                       prefixIcon: SizedBox(width: 8),
-                      suffixIcon: Icon(Icons.search, color: Colors.black54),
+                      suffixIcon: Icon(Icons.search, color: AppColors.black54),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -644,13 +644,13 @@ class _UserDashboardState extends State<UserDashboard> {
                             ),
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? const Color(0xFFD5CDF3)
-                                  : Colors.transparent,
+                                  ? AppColors.authBgBottom
+                                  : AppColors.transparent,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: isActive
-                                    ? const Color(0xFFD5CDF3)
-                                    : Colors.white54,
+                                    ? AppColors.authBgBottom
+                                    : AppColors.white54,
                                 width: 1.5,
                               ),
                             ),
@@ -658,7 +658,7 @@ class _UserDashboardState extends State<UserDashboard> {
                               cat,
                               style: TextStyle(
                                 color: isActive
-                                    ? const Color(0xFF1E1548)
+                                    ? AppColors.authBgTop
                                     : AppColors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
@@ -735,7 +735,7 @@ class _UserDashboardState extends State<UserDashboard> {
                                     onPressed: () =>
                                         _showAlatDetailModal(context, alat),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF1E1548),
+                                      backgroundColor: AppColors.authBgTop,
                                       foregroundColor: AppColors.white,
                                       minimumSize: const Size(
                                         double.infinity,
@@ -845,7 +845,7 @@ class _UserDashboardState extends State<UserDashboard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDE9F6),
+        color: AppColors.greyLightest,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -1016,7 +1016,7 @@ class _UserDashboardState extends State<UserDashboard> {
           ElevatedButton(
             onPressed: _logout,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC53030),
+              backgroundColor: AppColors.error,
               foregroundColor: AppColors.white,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
@@ -1053,7 +1053,7 @@ class _UserDashboardState extends State<UserDashboard> {
       child: Container(
         width: radius * 2,
         height: radius * 2,
-        color: Colors.grey.shade100,
+        color: AppColors.grey100,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -1066,7 +1066,7 @@ class _UserDashboardState extends State<UserDashboard> {
             final col = index % 8;
             final isEven = (row + col) % 2 == 0;
             return Container(
-              color: isEven ? Colors.white : Colors.grey.shade300,
+              color: isEven ? AppColors.white : AppColors.grey300,
             );
           },
         ),

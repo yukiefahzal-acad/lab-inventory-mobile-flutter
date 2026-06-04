@@ -197,31 +197,19 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   Widget _buildBadge(String visualStatus) {
     switch (visualStatus) {
       case 'denda':
-        return _badge(
-          'Denda',
-          const Color(0xFFFFE0E0),
-          const Color(0xFFC53030),
-        );
+        return _badge('Denda', AppColors.errorLight, AppColors.error);
       case 'lunas':
-        return _badge(
-          'Lunas',
-          const Color(0xFFD1FAE5),
-          const Color(0xFF059669),
-        );
+        return _badge('Lunas', AppColors.successLight, AppColors.successDark);
       case 'aktif':
         return _badge('Aktif', AppColors.primary, AppColors.white);
       case 'belum_verifikasi':
         return _badge(
           'Belum Verifikasi',
-          const Color(0xFFFEF3C7),
-          const Color(0xFFD97706),
+          AppColors.warningBg,
+          AppColors.warning,
         );
       default:
-        return _badge(
-          'Selesai',
-          const Color(0xFFD1FAE5),
-          const Color(0xFF059669),
-        );
+        return _badge('Selesai', AppColors.successLight, AppColors.successDark);
     }
   }
 
@@ -250,7 +238,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
       child: Container(
         width: width,
         height: height,
-        color: Colors.grey.shade100,
+        color: AppColors.grey100,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -262,7 +250,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
             final row = i ~/ 8;
             final col = i % 8;
             return Container(
-              color: (row + col) % 2 == 0 ? Colors.white : Colors.grey.shade200,
+              color: (row + col) % 2 == 0 ? AppColors.white : AppColors.grey200,
             );
           },
         ),
@@ -293,7 +281,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (_) => _DendaModal(
         item: item,
         denda: denda,
@@ -313,7 +301,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (_) => _QRDetailModal(
         item: item,
         isKembali: isKembali,
@@ -345,11 +333,11 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: AppColors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -357,12 +345,12 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
             ),
             child: TextField(
               controller: _searchCtrl,
-              style: const TextStyle(color: Colors.black87),
+              style: const TextStyle(color: AppColors.black87),
               decoration: const InputDecoration(
                 hintText: 'Cari...',
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
                 prefixIcon: SizedBox(width: 8),
-                suffixIcon: Icon(Icons.search, color: Colors.black54),
+                suffixIcon: Icon(Icons.search, color: AppColors.black54),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 14),
               ),
@@ -382,7 +370,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
               ? const Center(
                   child: Text(
                     'Tidak ada data peminjaman.',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                    style: TextStyle(color: AppColors.white70, fontSize: 16),
                   ),
                 )
               : RefreshIndicator(
@@ -396,7 +384,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                     ),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
@@ -445,7 +433,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                               style: TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.black,
+                                                color: AppColors.black,
                                               ),
                                             ),
                                             const SizedBox(height: 2),
@@ -453,7 +441,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                               'Kode: UNI-00${item.peminjaman.id ?? 0}',
                                               style: const TextStyle(
                                                 fontSize: 13,
-                                                color: Colors.black54,
+                                                color: AppColors.black54,
                                               ),
                                             ),
                                             const SizedBox(height: 2),
@@ -461,7 +449,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                               'Terlambat: X Hari',
                                               style: TextStyle(
                                                 fontSize: 13,
-                                                color: Colors.black54,
+                                                color: AppColors.black54,
                                               ),
                                             ),
                                           ],
@@ -480,8 +468,8 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                                 fontWeight: FontWeight.bold,
                                                 color:
                                                     item.visualStatus == 'lunas'
-                                                    ? const Color(0xFF059669)
-                                                    : const Color(0xFFC53030),
+                                                    ? AppColors.successDark
+                                                    : AppColors.error,
                                               ),
                                             ),
                                             const SizedBox(height: 6),
@@ -498,7 +486,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                   height: 1,
                                   indent: 16,
                                   endIndent: 16,
-                                  color: Color(0xFFEEEEEE),
+                                  color: AppColors.grey200,
                                 ),
                             ],
                           );
@@ -576,18 +564,18 @@ class _DendaModal extends StatelessWidget {
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: AppColors.black,
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black26),
+              border: Border.all(color: AppColors.black26),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               value,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: AppColors.black87),
             ),
           ),
         ],
@@ -604,7 +592,7 @@ class _DendaModal extends StatelessWidget {
       builder: (_, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -614,7 +602,7 @@ class _DendaModal extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.grey300,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -628,11 +616,11 @@ class _DendaModal extends StatelessWidget {
                         margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
+                              color: AppColors.black.withValues(alpha: 0.06),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -651,21 +639,21 @@ class _DendaModal extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      color: AppColors.black,
                                     ),
                                   ),
                                   Text(
                                     'Kode: UNI-00${item.peminjaman.id ?? 0}',
                                     style: const TextStyle(
                                       fontSize: 13,
-                                      color: Colors.black54,
+                                      color: AppColors.black54,
                                     ),
                                   ),
                                   const Text(
                                     'Terlambat: X Hari',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Colors.black54,
+                                      color: AppColors.black54,
                                     ),
                                   ),
                                 ],
@@ -679,7 +667,7 @@ class _DendaModal extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFFC53030),
+                                    color: AppColors.error,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -689,7 +677,7 @@ class _DendaModal extends StatelessWidget {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFE0E0),
+                                    color: AppColors.errorLight,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Text(
@@ -697,7 +685,7 @@ class _DendaModal extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFFC53030),
+                                      color: AppColors.error,
                                     ),
                                   ),
                                 ),
@@ -726,7 +714,7 @@ class _DendaModal extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppColors.black,
                           ),
                         ),
                       ),
@@ -736,7 +724,7 @@ class _DendaModal extends StatelessWidget {
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black54,
+                            color: AppColors.black54,
                             height: 1.4,
                           ),
                         ),
@@ -766,7 +754,7 @@ class _DendaModal extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppColors.black,
                               ),
                             ),
                             Container(
@@ -775,7 +763,7 @@ class _DendaModal extends StatelessWidget {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black26),
+                                border: Border.all(color: AppColors.black26),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Text(
@@ -783,7 +771,7 @@ class _DendaModal extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                             ),
@@ -799,8 +787,8 @@ class _DendaModal extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: onLunas,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF22C55E),
-                              foregroundColor: Colors.white,
+                              backgroundColor: AppColors.successMain,
+                              foregroundColor: AppColors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
@@ -872,18 +860,18 @@ class _QRDetailModalState extends State<_QRDetailModal> {
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: AppColors.black,
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black26),
+              border: Border.all(color: AppColors.black26),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               value,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: AppColors.black87),
             ),
           ),
         ],
@@ -903,7 +891,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
       builder: (_, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -913,7 +901,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.grey300,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -922,7 +910,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                 // child: Row(
                 //   children: [
                 //     IconButton(
-                //       icon: const Icon(Icons.arrow_back, color: Colors.black),
+                //       icon: const Icon(Icons.arrow_back, color: AppColors.black),
                 //       onPressed: () => Navigator.pop(context),
                 //     ),
                 //     const Text(
@@ -930,7 +918,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                 //       style: TextStyle(
                 //         fontSize: 18,
                 //         fontWeight: FontWeight.bold,
-                //         color: Colors.black,
+                //         color: AppColors.black,
                 //       ),
                 //     ),
                 //   ],
@@ -962,7 +950,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppColors.black,
                           ),
                         ),
                       ),
@@ -972,7 +960,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black54,
+                            color: AppColors.black54,
                             height: 1.4,
                           ),
                         ),
@@ -1000,7 +988,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: AppColors.black,
                             ),
                           ),
                         ),
@@ -1010,7 +998,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                             'Bolong pada bagian bawah kiri',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black54,
+                              color: AppColors.black54,
                             ),
                           ),
                         ),
@@ -1024,7 +1012,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                               const Spacer(),
@@ -1038,8 +1026,8 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: _dendaRusak
-                                        ? const Color(0xFFFFE0E0)
-                                        : const Color(0xFFFDE8E8),
+                                        ? AppColors.errorLight
+                                        : AppColors.errorBg,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Text(
@@ -1047,7 +1035,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFFC53030),
+                                      color: AppColors.error,
                                     ),
                                   ),
                                 ),
@@ -1063,8 +1051,8 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: _dendaTelat
-                                        ? const Color(0xFFFFE0E0)
-                                        : const Color(0xFFFDE8E8),
+                                        ? AppColors.errorLight
+                                        : AppColors.errorBg,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Text(
@@ -1072,7 +1060,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFFC53030),
+                                      color: AppColors.error,
                                     ),
                                   ),
                                 ),
@@ -1080,7 +1068,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                               const SizedBox(width: 8),
                               const Icon(
                                 Icons.keyboard_arrow_down,
-                                color: Colors.black45,
+                                color: AppColors.black45,
                               ),
                             ],
                           ),
@@ -1094,7 +1082,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: AppColors.black,
                             ),
                           ),
                         ),
@@ -1102,7 +1090,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Container(
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black26),
+                              border: Border.all(color: AppColors.black26),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: TextField(
@@ -1110,7 +1098,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                               maxLines: 4,
                               decoration: const InputDecoration(
                                 hintText: 'Isi catatan alat disini...',
-                                hintStyle: TextStyle(color: Colors.black38),
+                                hintStyle: TextStyle(color: AppColors.black38),
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.all(14),
                               ),
@@ -1129,7 +1117,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppColors.black,
                               ),
                             ),
                             Container(
@@ -1138,7 +1126,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black26),
+                                border: Border.all(color: AppColors.black26),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Text(
@@ -1146,7 +1134,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                             ),
@@ -1163,9 +1151,9 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                             onPressed: widget.onVerifikasi,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isKembali
-                                  ? const Color(0xFFD4AA70)
-                                  : const Color(0xFF8B6914),
-                              foregroundColor: Colors.white,
+                                  ? AppColors.warningMain
+                                  : AppColors.warningDark,
+                              foregroundColor: AppColors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),

@@ -10,32 +10,45 @@ class ApiResponse<T> {
 
   ApiResponse({required this.status, required this.message, this.data});
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json, {T Function(dynamic)? fromJsonData}) {
+  factory ApiResponse.fromJson(
+    Map<String, dynamic> json, {
+    T Function(dynamic)? fromJsonData,
+  }) {
     return ApiResponse(
       status: json['status'] ?? 'error',
       message: json['message'] ?? 'Unknown error',
-      data: json['data'] != null && fromJsonData != null ? fromJsonData(json['data']) : null,
+      data: json['data'] != null && fromJsonData != null
+          ? fromJsonData(json['data'])
+          : null,
     );
   }
 }
 
 class ApiService {
   static String get baseUrl => dotenv.env['BASE_URL'] ?? 'http://10.0.2.2/';
-  
-  static bool get _isSimulation => dotenv.env['simulation_app'] == 'true' || dotenv.env['SIMULATION_APP'] == 'true';
 
-  static ApiResponse<dynamic> _getDummyResponse(String endpoint, String method, {Map<String, dynamic>? body}) {
+  static bool get _isSimulation =>
+      dotenv.env['simulation_app'] == 'true' ||
+      dotenv.env['SIMULATION_APP'] == 'true';
+
+  static ApiResponse<dynamic> _getDummyResponse(
+    String endpoint,
+    String method, {
+    Map<String, dynamic>? body,
+  }) {
     print('--- SIMULATION MODE: $method request to $endpoint intercepted ---');
-    
+
     if (endpoint == 'api/login') {
-      final role = (body != null && body['username'] == 'admin') ? 'admin' : 'user';
+      final role = (body != null && body['username'] == 'admin')
+          ? 'admin'
+          : 'user';
       return ApiResponse(
         status: 'success',
         message: 'Login successful (Simulation)',
         data: {'token': 'dummy_token_123', 'role': role},
       );
     }
-    
+
     if (endpoint == 'api/register') {
       return ApiResponse(
         status: 'success',
@@ -49,22 +62,69 @@ class ApiService {
         status: 'success',
         message: 'Alat fetched (Simulation)',
         data: [
-          {'id': 1, 'nama': 'Proyektor Epson', 'deskripsi': 'Proyektor 1080p', 'status_awal': 'baik', 'qr_code': 'QR001'},
-          {'id': 2, 'nama': 'Kabel HDMI 5m', 'deskripsi': 'Kabel HDMI panjang', 'status_awal': 'baik', 'qr_code': 'QR002'},
+          {
+            'id': 1,
+            'nama': 'Proyektor Epson',
+            'deskripsi': 'Proyektor 1080p',
+            'status_awal': 'baik',
+            'qr_code': 'QR001',
+          },
+          {
+            'id': 2,
+            'nama': 'Kabel HDMI 5m',
+            'deskripsi': 'Kabel HDMI panjang',
+            'status_awal': 'baik',
+            'qr_code': 'QR002',
+          },
         ],
       );
     }
-    
+
     if (endpoint == 'api/admin/peminjaman' && method == 'GET') {
       return ApiResponse(
         status: 'success',
         message: 'Peminjaman fetched (Simulation)',
         data: [
-          {'id': 1, 'user_id': 1, 'alat_id': 1, 'tanggal_pinjam': '01/05/2026', 'tanggal_kembali': '05/05/2026', 'status': 'denda'},
-          {'id': 2, 'user_id': 2, 'alat_id': 2, 'tanggal_pinjam': '10/05/2026', 'tanggal_kembali': '15/05/2026', 'status': 'lunas'},
-          {'id': 3, 'user_id': 3, 'alat_id': 1, 'tanggal_pinjam': '20/05/2026', 'tanggal_kembali': '25/05/2026', 'status': 'active'},
-          {'id': 4, 'user_id': 4, 'alat_id': 2, 'tanggal_pinjam': '28/05/2026', 'tanggal_kembali': '02/06/2026', 'status': 'pending'},
-          {'id': 5, 'user_id': 5, 'alat_id': 1, 'tanggal_pinjam': '01/04/2026', 'tanggal_kembali': '05/04/2026', 'status': 'returned'},
+          {
+            'id': 1,
+            'user_id': 1,
+            'alat_id': 1,
+            'tanggal_pinjam': '01/05/2026',
+            'tanggal_kembali': '05/05/2026',
+            'status': 'denda',
+          },
+          {
+            'id': 2,
+            'user_id': 2,
+            'alat_id': 2,
+            'tanggal_pinjam': '10/05/2026',
+            'tanggal_kembali': '15/05/2026',
+            'status': 'lunas',
+          },
+          {
+            'id': 3,
+            'user_id': 3,
+            'alat_id': 1,
+            'tanggal_pinjam': '20/05/2026',
+            'tanggal_kembali': '25/05/2026',
+            'status': 'active',
+          },
+          {
+            'id': 4,
+            'user_id': 4,
+            'alat_id': 2,
+            'tanggal_pinjam': '28/05/2026',
+            'tanggal_kembali': '02/06/2026',
+            'status': 'pending',
+          },
+          {
+            'id': 5,
+            'user_id': 5,
+            'alat_id': 1,
+            'tanggal_pinjam': '01/04/2026',
+            'tanggal_kembali': '05/04/2026',
+            'status': 'returned',
+          },
         ],
       );
     }
@@ -74,7 +134,13 @@ class ApiService {
         status: 'success',
         message: 'Denda fetched (Simulation)',
         data: [
-          {'id': 1, 'user_id': 2, 'peminjaman_id': 1, 'jumlah': 50000, 'status': 'unpaid'},
+          {
+            'id': 1,
+            'user_id': 2,
+            'peminjaman_id': 1,
+            'jumlah': 50000,
+            'status': 'unpaid',
+          },
         ],
       );
     }
@@ -84,7 +150,14 @@ class ApiService {
         status: 'success',
         message: 'Active peminjaman fetched (Simulation)',
         data: [
-          {'id': 1, 'user_id': 1, 'alat_id': 1, 'tanggal_pinjam': '2026-05-10', 'tanggal_kembali': '2026-05-15', 'status': 'active'},
+          {
+            'id': 1,
+            'user_id': 1,
+            'alat_id': 1,
+            'tanggal_pinjam': '2026-05-10',
+            'tanggal_kembali': '2026-05-15',
+            'status': 'active',
+          },
         ],
       );
     }
@@ -94,7 +167,13 @@ class ApiService {
         status: 'success',
         message: 'User denda fetched (Simulation)',
         data: [
-          {'id': 1, 'user_id': 1, 'peminjaman_id': 1, 'jumlah': 25000, 'status': 'unpaid'},
+          {
+            'id': 1,
+            'user_id': 1,
+            'peminjaman_id': 1,
+            'jumlah': 25000,
+            'status': 'unpaid',
+          },
         ],
       );
     }
@@ -102,10 +181,7 @@ class ApiService {
     return ApiResponse(
       status: 'success',
       message: 'Simulation data for $endpoint',
-      data: {
-        'id': 999,
-        'message': 'This is a generic simulated response',
-      },
+      data: {'id': 999, 'message': 'This is a generic simulated response'},
     );
   }
 
@@ -122,14 +198,20 @@ class ApiService {
   static Future<ApiResponse<dynamic>> get(String endpoint) async {
     if (_isSimulation) return _getDummyResponse(endpoint, 'GET');
     try {
-      final response = await http.get(Uri.parse('$baseUrl$endpoint'), headers: await _getHeaders());
+      final response = await http.get(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: await _getHeaders(),
+      );
       return _processResponse(response);
     } catch (e) {
       return ApiResponse(status: 'error', message: e.toString());
     }
   }
 
-  static Future<ApiResponse<dynamic>> post(String endpoint, Map<String, dynamic> body) async {
+  static Future<ApiResponse<dynamic>> post(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
     if (_isSimulation) return _getDummyResponse(endpoint, 'POST', body: body);
     try {
       final response = await http.post(
@@ -143,7 +225,10 @@ class ApiService {
     }
   }
 
-  static Future<ApiResponse<dynamic>> put(String endpoint, Map<String, dynamic> body) async {
+  static Future<ApiResponse<dynamic>> put(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
     if (_isSimulation) return _getDummyResponse(endpoint, 'PUT', body: body);
     try {
       final response = await http.put(
@@ -156,7 +241,7 @@ class ApiService {
       return ApiResponse(status: 'error', message: e.toString());
     }
   }
-  
+
   static Future<ApiResponse<dynamic>> delete(String endpoint) async {
     if (_isSimulation) return _getDummyResponse(endpoint, 'DELETE');
     try {

@@ -88,7 +88,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
     return Container(
       width: double.infinity,
       height: height,
-      color: Colors.grey.shade100,
+      color: AppColors.grey100,
       child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
@@ -100,7 +100,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
           final row = index ~/ 12;
           final col = index % 12;
           final isEven = (row + col) % 2 == 0;
-          return Container(color: isEven ? Colors.white : Colors.grey.shade200);
+          return Container(color: isEven ? AppColors.white : AppColors.grey200);
         },
       ),
     );
@@ -115,11 +115,11 @@ class _AlatListScreenState extends State<AlatListScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: AppColors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -127,12 +127,12 @@ class _AlatListScreenState extends State<AlatListScreen> {
             ),
             child: TextField(
               controller: _searchCtrl,
-              style: const TextStyle(color: Colors.black87),
+              style: const TextStyle(color: AppColors.black87),
               decoration: const InputDecoration(
                 hintText: 'Cari alat',
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
                 prefixIcon: SizedBox(width: 8),
-                suffixIcon: Icon(Icons.search, color: Colors.black54),
+                suffixIcon: Icon(Icons.search, color: AppColors.black54),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 14),
               ),
@@ -165,13 +165,13 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFFD5CDF3)
-                          : Colors.transparent,
+                          ? AppColors.authBgBottom
+                          : AppColors.transparent,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFFD5CDF3)
-                            : Colors.white54,
+                            ? AppColors.authBgBottom
+                            : AppColors.white54,
                         width: 1.5,
                       ),
                     ),
@@ -179,8 +179,8 @@ class _AlatListScreenState extends State<AlatListScreen> {
                       _filters[index],
                       style: TextStyle(
                         color: isSelected
-                            ? const Color(0xFF1E1548)
-                            : Colors.white,
+                            ? AppColors.authBgTop
+                            : AppColors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -206,7 +206,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
               child: Text(
                 'Tidak ada alat ditemukan.',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: AppColors.white.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
               ),
@@ -230,11 +230,11 @@ class _AlatListScreenState extends State<AlatListScreen> {
                   : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor';
               return Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: AppColors.black.withValues(alpha: 0.05),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -259,7 +259,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: Colors.black87,
+                                  color: AppColors.black87,
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -269,7 +269,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: Colors.grey.shade600,
+                                    color: AppColors.grey600,
                                     fontSize: 11,
                                     height: 1.3,
                                   ),
@@ -304,7 +304,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                                   child: const Text(
                                                     'Hapus',
                                                     style: TextStyle(
-                                                      color: Colors.red,
+                                                      color: AppColors.red,
                                                     ),
                                                   ),
                                                 ),
@@ -345,7 +345,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                         },
                                         style: OutlinedButton.styleFrom(
                                           side: const BorderSide(
-                                            color: Color(0xFFFDE8E8),
+                                            color: AppColors.errorBg,
                                           ),
                                           backgroundColor: const Color(
                                             0xFFFDE8E8,
@@ -388,7 +388,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                           backgroundColor: const Color(
                                             0xFF1E1548,
                                           ),
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: AppColors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               8,

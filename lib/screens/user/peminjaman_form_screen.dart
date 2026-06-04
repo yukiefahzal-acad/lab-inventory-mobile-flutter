@@ -36,10 +36,14 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
 
     if (!mounted) return;
     if (res.status == 'success') {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Peminjaman berhasil diajukan')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Peminjaman berhasil diajukan')),
+      );
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(res.message)));
     }
   }
 
@@ -55,9 +59,12 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
             children: [
               TextFormField(
                 controller: _alatIdCtrl,
-                decoration: const InputDecoration(labelText: 'ID Alat (atau Scan QR)'),
+                decoration: const InputDecoration(
+                  labelText: 'ID Alat (atau Scan QR)',
+                ),
                 keyboardType: TextInputType.number,
-                validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Wajib diisi' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -68,7 +75,8 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Wajib diisi';
-                  if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(val)) return 'Format harus MM/DD/YYYY';
+                  if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(val))
+                    return 'Format harus MM/DD/YYYY';
                   return null;
                 },
               ),
@@ -81,7 +89,8 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Wajib diisi';
-                  if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(val)) return 'Format harus MM/DD/YYYY';
+                  if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(val))
+                    return 'Format harus MM/DD/YYYY';
                   return null;
                 },
               ),
@@ -90,9 +99,11 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _submit,
-                      style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
                       child: const Text('Ajukan Peminjaman'),
-                    )
+                    ),
             ],
           ),
         ),

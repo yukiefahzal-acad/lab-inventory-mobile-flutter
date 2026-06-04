@@ -54,7 +54,9 @@ class AlatDetailModal {
                       Positioned(
                         left: 10,
                         child: CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.8),
+                          backgroundColor: AppColors.white.withValues(
+                            alpha: 0.8,
+                          ),
                           radius: 18,
                           child: IconButton(
                             icon: const Icon(
@@ -70,7 +72,9 @@ class AlatDetailModal {
                       Positioned(
                         right: 10,
                         child: CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.8),
+                          backgroundColor: AppColors.white.withValues(
+                            alpha: 0.8,
+                          ),
                           radius: 18,
                           child: IconButton(
                             icon: const Icon(
@@ -263,7 +267,7 @@ class AlatDetailModal {
       child: Container(
         width: width,
         height: height,
-        color: Colors.grey.shade100,
+        color: AppColors.grey100,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -276,7 +280,7 @@ class AlatDetailModal {
             final col = index % 8;
             final isEven = (row + col) % 2 == 0;
             return Container(
-              color: isEven ? Colors.white : Colors.grey.shade300,
+              color: isEven ? AppColors.white : AppColors.grey300,
             );
           },
         ),
