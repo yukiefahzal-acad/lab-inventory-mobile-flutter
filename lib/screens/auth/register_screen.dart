@@ -61,9 +61,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     final res = await ApiService.post('api/register', {
       'nama': nama,
-      'nim': nim,
+      'nim_nip': nim,
       'email': email,
-      'username': email,
       'password': password,
     });
 

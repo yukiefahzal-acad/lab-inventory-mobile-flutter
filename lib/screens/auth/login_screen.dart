@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
     final res = await ApiService.post('api/login', {
-      'username': _usernameCtrl.text,
+      'email': _usernameCtrl.text,
       'password': _passwordCtrl.text,
     });
 
@@ -50,6 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
       await prefs.setString('role', role);
+      await prefs.setInt('id', res.data['id'] ?? 0);
+      await prefs.setString('nim_nip', res.data['nim_nip'] ?? '');
+      await prefs.setString('email', res.data['email'] ?? '');
+      await prefs.setString('nama', res.data['nama'] ?? '');
 
       if (!mounted) return;
       if (role == 'admin') {

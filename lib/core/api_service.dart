@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:project_uas/core/cookie_handler.dart';
 
 class ApiResponse<T> {
   final String status;
@@ -27,181 +29,40 @@ class ApiResponse<T> {
 class ApiService {
   static String get baseUrl => dotenv.env['BASE_URL'] ?? 'http://10.0.2.2/';
 
-  static bool get _isSimulation =>
-      dotenv.env['simulation_app'] == 'true' ||
-      dotenv.env['SIMULATION_APP'] == 'true';
-
-  static ApiResponse<dynamic> _getDummyResponse(
-    String endpoint,
-    String method, {
-    Map<String, dynamic>? body,
-  }) {
-    print('--- SIMULATION MODE: $method request to $endpoint intercepted ---');
-
-    if (endpoint == 'api/login') {
-      final role = (body != null && body['username'] == 'admin')
-          ? 'admin'
-          : 'user';
-      return ApiResponse(
-        status: 'success',
-        message: 'Login successful (Simulation)',
-        data: {'token': 'dummy_token_123', 'role': role},
-      );
-    }
-
-    if (endpoint == 'api/register') {
-      return ApiResponse(
-        status: 'success',
-        message: 'Registration successful (Simulation)',
-        data: {'id': 1},
-      );
-    }
-
-    if (endpoint == 'api/alat' && method == 'GET') {
-      return ApiResponse(
-        status: 'success',
-        message: 'Alat fetched (Simulation)',
-        data: [
-          {
-            'id': 1,
-            'nama': 'Proyektor Epson',
-            'deskripsi': 'Proyektor 1080p',
-            'status_awal': 'baik',
-            'qr_code': 'QR001',
-          },
-          {
-            'id': 2,
-            'nama': 'Kabel HDMI 5m',
-            'deskripsi': 'Kabel HDMI panjang',
-            'status_awal': 'baik',
-            'qr_code': 'QR002',
-          },
-        ],
-      );
-    }
-
-    if (endpoint == 'api/admin/peminjaman' && method == 'GET') {
-      return ApiResponse(
-        status: 'success',
-        message: 'Peminjaman fetched (Simulation)',
-        data: [
-          {
-            'id': 1,
-            'user_id': 1,
-            'alat_id': 1,
-            'tanggal_pinjam': '01/05/2026',
-            'tanggal_kembali': '05/05/2026',
-            'status': 'denda',
-          },
-          {
-            'id': 2,
-            'user_id': 2,
-            'alat_id': 2,
-            'tanggal_pinjam': '10/05/2026',
-            'tanggal_kembali': '15/05/2026',
-            'status': 'lunas',
-          },
-          {
-            'id': 3,
-            'user_id': 3,
-            'alat_id': 1,
-            'tanggal_pinjam': '20/05/2026',
-            'tanggal_kembali': '25/05/2026',
-            'status': 'active',
-          },
-          {
-            'id': 4,
-            'user_id': 4,
-            'alat_id': 2,
-            'tanggal_pinjam': '28/05/2026',
-            'tanggal_kembali': '02/06/2026',
-            'status': 'pending',
-          },
-          {
-            'id': 5,
-            'user_id': 5,
-            'alat_id': 1,
-            'tanggal_pinjam': '01/04/2026',
-            'tanggal_kembali': '05/04/2026',
-            'status': 'returned',
-          },
-        ],
-      );
-    }
-
-    if (endpoint == 'api/admin/denda' && method == 'GET') {
-      return ApiResponse(
-        status: 'success',
-        message: 'Denda fetched (Simulation)',
-        data: [
-          {
-            'id': 1,
-            'user_id': 2,
-            'peminjaman_id': 1,
-            'jumlah': 50000,
-            'status': 'unpaid',
-          },
-        ],
-      );
-    }
-
-    if (endpoint == 'api/user/peminjaman/active' && method == 'GET') {
-      return ApiResponse(
-        status: 'success',
-        message: 'Active peminjaman fetched (Simulation)',
-        data: [
-          {
-            'id': 1,
-            'user_id': 1,
-            'alat_id': 1,
-            'tanggal_pinjam': '2026-05-10',
-            'tanggal_kembali': '2026-05-15',
-            'status': 'active',
-          },
-        ],
-      );
-    }
-
-    if (endpoint == 'api/user/denda' && method == 'GET') {
-      return ApiResponse(
-        status: 'success',
-        message: 'User denda fetched (Simulation)',
-        data: [
-          {
-            'id': 1,
-            'user_id': 1,
-            'peminjaman_id': 1,
-            'jumlah': 25000,
-            'status': 'unpaid',
-          },
-        ],
-      );
-    }
-
-    return ApiResponse(
-      status: 'success',
-      message: 'Simulation data for $endpoint',
-      data: {'id': 999, 'message': 'This is a generic simulated response'},
-    );
-  }
-
   static Future<Map<String, String>> _getHeaders() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    final infinityCookie = prefs.getString('infinity_cookie') ?? '';
+    
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36',
       if (token != null) 'Authorization': 'Bearer $token',
+      if (infinityCookie.isNotEmpty) 'Cookie': infinityCookie,
     };
   }
 
-  static Future<ApiResponse<dynamic>> get(String endpoint) async {
-    if (_isSimulation) return _getDummyResponse(endpoint, 'GET');
+  static bool _isBlocked(http.Response response) {
+    if (response.headers['content-type']?.contains('text/html') == true) {
+      return true;
+    }
+    if (response.body.contains('aes.js') || response.body.contains('__test')) {
+      return true;
+    }
+    return false;
+  }
+
+  static Future<ApiResponse<dynamic>> get(String endpoint, {bool isRetry = false}) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl$endpoint'),
         headers: await _getHeaders(),
       );
+      if (!isRetry && _isBlocked(response)) {
+        await CookieHandler.fetchInfinityCookie();
+        return get(endpoint, isRetry: true);
+      }
       return _processResponse(response);
     } catch (e) {
       return ApiResponse(status: 'error', message: e.toString());
@@ -210,15 +71,19 @@ class ApiService {
 
   static Future<ApiResponse<dynamic>> post(
     String endpoint,
-    Map<String, dynamic> body,
-  ) async {
-    if (_isSimulation) return _getDummyResponse(endpoint, 'POST', body: body);
+    Map<String, dynamic> body, {
+    bool isRetry = false,
+  }) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl$endpoint'),
         headers: await _getHeaders(),
         body: jsonEncode(body),
       );
+      if (!isRetry && _isBlocked(response)) {
+        await CookieHandler.fetchInfinityCookie();
+        return post(endpoint, body, isRetry: true);
+      }
       return _processResponse(response);
     } catch (e) {
       return ApiResponse(status: 'error', message: e.toString());
@@ -227,28 +92,74 @@ class ApiService {
 
   static Future<ApiResponse<dynamic>> put(
     String endpoint,
-    Map<String, dynamic> body,
-  ) async {
-    if (_isSimulation) return _getDummyResponse(endpoint, 'PUT', body: body);
+    Map<String, dynamic> body, {
+    bool isRetry = false,
+  }) async {
     try {
       final response = await http.put(
         Uri.parse('$baseUrl$endpoint'),
         headers: await _getHeaders(),
         body: jsonEncode(body),
       );
+      if (!isRetry && _isBlocked(response)) {
+        await CookieHandler.fetchInfinityCookie();
+        return put(endpoint, body, isRetry: true);
+      }
       return _processResponse(response);
     } catch (e) {
       return ApiResponse(status: 'error', message: e.toString());
     }
   }
 
-  static Future<ApiResponse<dynamic>> delete(String endpoint) async {
-    if (_isSimulation) return _getDummyResponse(endpoint, 'DELETE');
+  static Future<ApiResponse<dynamic>> delete(
+    String endpoint, [
+    Map<String, dynamic>? body,
+    bool isRetry = false,
+  ]) async {
     try {
       final response = await http.delete(
         Uri.parse('$baseUrl$endpoint'),
         headers: await _getHeaders(),
+        body: body != null ? jsonEncode(body) : null,
       );
+      if (!isRetry && _isBlocked(response)) {
+        await CookieHandler.fetchInfinityCookie();
+        return delete(endpoint, body, true);
+      }
+      return _processResponse(response);
+    } catch (e) {
+      return ApiResponse(status: 'error', message: e.toString());
+    }
+  }
+
+  static Future<ApiResponse<dynamic>> uploadFile(
+    String endpoint,
+    Uint8List fileBytes,
+    String fileName, {
+    String fieldName = 'foto',
+    bool isRetry = false,
+  }) async {
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl$endpoint'),
+      );
+      
+      final headers = await _getHeaders();
+      request.headers.addAll(headers);
+
+      request.files.add(http.MultipartFile.fromBytes(
+        fieldName,
+        fileBytes,
+        filename: fileName,
+      ));
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      
+      if (!isRetry && _isBlocked(response)) {
+        await CookieHandler.fetchInfinityCookie();
+        return uploadFile(endpoint, fileBytes, fileName, fieldName: fieldName, isRetry: true);
+      }
       return _processResponse(response);
     } catch (e) {
       return ApiResponse(status: 'error', message: e.toString());
@@ -256,18 +167,30 @@ class ApiService {
   }
 
   static ApiResponse<dynamic> _processResponse(http.Response response) {
+    print('========== API RESPONSE ==========');
+    print('URL: ${response.request?.url}');
+    print('Status Code: ${response.statusCode}');
+    print('Response Headers: ${response.headers}');
+    print('Response Body: ${response.body}');
+    print('==================================');
+    
     try {
       final decoded = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return ApiResponse.fromJson(decoded);
+        return ApiResponse(
+          status: decoded['status'] ?? 'success',
+          message: decoded['message'] ?? 'Success',
+          data: decoded['data'] ?? decoded,
+        );
       } else {
         return ApiResponse(
-          status: 'error',
+          status: decoded['status'] ?? 'error',
           message: decoded['message'] ?? 'Error ${response.statusCode}',
           data: decoded['data'],
         );
       }
     } catch (e) {
+      print('JSON Decode Error: $e');
       return ApiResponse(status: 'error', message: 'Invalid response format');
     }
   }

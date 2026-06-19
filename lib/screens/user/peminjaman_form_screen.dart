@@ -14,6 +14,7 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
   late final TextEditingController _alatIdCtrl;
   final _tanggalPinjamCtrl = TextEditingController();
   final _tanggalKembaliCtrl = TextEditingController();
+  final _jumlahCtrl = TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -26,10 +27,11 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    final res = await ApiService.post('api/peminjaman', {
+    final res = await ApiService.post('api/booking', {
       'alat_id': int.tryParse(_alatIdCtrl.text),
       'tanggal_pinjam': _tanggalPinjamCtrl.text,
-      'tanggal_kembali': _tanggalKembaliCtrl.text,
+      'tanggal_kembali_rencana': _tanggalKembaliCtrl.text,
+      'jumlah': int.tryParse(_jumlahCtrl.text) ?? 1,
     });
 
     setState(() => _isLoading = false);
@@ -71,12 +73,13 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
                 controller: _tanggalPinjamCtrl,
                 decoration: const InputDecoration(
                   labelText: 'Tanggal Pinjam',
-                  hintText: 'MM/DD/YYYY',
+                  hintText: 'YYYY-MM-DD',
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Wajib diisi';
-                  if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(val))
-                    return 'Format harus MM/DD/YYYY';
+                  if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(val)) {
+                    return 'Format harus YYYY-MM-DD';
+                  }
                   return null;
                 },
               ),
@@ -85,12 +88,27 @@ class _PeminjamanFormScreenState extends State<PeminjamanFormScreen> {
                 controller: _tanggalKembaliCtrl,
                 decoration: const InputDecoration(
                   labelText: 'Tanggal Kembali',
-                  hintText: 'MM/DD/YYYY',
+                  hintText: 'YYYY-MM-DD',
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Wajib diisi';
-                  if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(val))
-                    return 'Format harus MM/DD/YYYY';
+                  if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(val)) {
+                    return 'Format harus YYYY-MM-DD';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _jumlahCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Jumlah',
+                  hintText: '1',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (val) {
+                  if (val == null || val.isEmpty) return 'Wajib diisi';
+                  if (int.tryParse(val) == null) return 'Harus angka';
                   return null;
                 },
               ),

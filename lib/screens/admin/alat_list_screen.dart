@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/api_service.dart';
 import '../../core/app_colors.dart';
 import '../../models/models.dart';
+import '../../widgets/alat_detail_modal.dart';
 import 'alat_form_screen.dart';
 
 class AlatListScreen extends StatefulWidget {
@@ -16,9 +17,10 @@ class _AlatListScreenState extends State<AlatListScreen> {
   List<Alat> _allAlatList = [];
   List<Alat> _filteredAlatList = [];
   bool _isLoading = true;
+  bool _allowRefresh = true;
   final TextEditingController _searchCtrl = TextEditingController();
   int _selectedFilterIndex = 0;
-  final List<String> _filters = ['Monitor', 'Tools', 'Kabel', 'Tester'];
+  List<String> _filters = ['Semua'];
 
   @override
   void initState() {
@@ -38,15 +40,30 @@ class _AlatListScreenState extends State<AlatListScreen> {
     _applyFilters();
   }
 
+  String _capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   Future<void> _fetchAlat() async {
     setState(() => _isLoading = true);
     final res = await ApiService.get('api/alat');
     if (res.status == 'success' && res.data != null) {
       final List<dynamic> data = res.data;
-      setState(() {
-        _allAlatList = data.map((e) => Alat.fromJson(e)).toList();
-        _applyFilters();
-      });
+      final parsed = data.map((e) => Alat.fromJson(e)).toList();
+      
+      final Set<String> uniqueCats = {};
+      for (final alat in parsed) {
+        uniqueCats.addAll(alat.kategoriList.map((c) => _capitalizeFirstLetter(c.trim())).where((c) => c.isNotEmpty));
+      }
+      
+      if (mounted) {
+        setState(() {
+          _allAlatList = parsed;
+          _filters = ['Semua', ...uniqueCats.toList()..sort()];
+          _applyFilters();
+        });
+      }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -62,22 +79,17 @@ class _AlatListScreenState extends State<AlatListScreen> {
     setState(() {
       _filteredAlatList = _allAlatList.where((alat) {
         final matchesSearch =
-            alat.nama.toLowerCase().contains(query) ||
-            alat.deskripsi.toLowerCase().contains(query);
+            alat.namaAlat.toLowerCase().contains(query) ||
+            alat.spesifikasi.toLowerCase().contains(query);
 
-        // Simulating category matching for filters:
-        // 'Monitor', 'Tools', 'Kabel', 'Tester'
-        if (_selectedFilterIndex == 0) {
-          // Monitor: show all/any projector or screens
+        if (_selectedFilterIndex == 0 || _filters.isEmpty) {
           return matchesSearch;
-        } else if (_selectedFilterIndex == 1) {
-          // Tools: e.g. tools
-          return matchesSearch && !alat.nama.toLowerCase().contains('kabel');
-        } else if (_selectedFilterIndex == 2) {
-          // Kabel
-          return matchesSearch && alat.nama.toLowerCase().contains('kabel');
         } else {
-          // Tester
+          if (_selectedFilterIndex < _filters.length) {
+            final selectedCategory = _filters[_selectedFilterIndex].toLowerCase();
+            final hasCategory = alat.kategoriList.any((c) => c.trim().toLowerCase() == selectedCategory);
+            return matchesSearch && hasCategory;
+          }
           return matchesSearch;
         }
       }).toList();
@@ -165,13 +177,13 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.authBgBottom
+                          ? AppColors.secondary
                           : AppColors.transparent,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected
-                            ? AppColors.authBgBottom
-                            : AppColors.white54,
+                            ? AppColors.secondary
+                            : AppColors.grey,
                         width: 1.5,
                       ),
                     ),
@@ -179,8 +191,8 @@ class _AlatListScreenState extends State<AlatListScreen> {
                       _filters[index],
                       style: TextStyle(
                         color: isSelected
-                            ? AppColors.authBgTop
-                            : AppColors.white,
+                            ? AppColors.white
+                            : AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -220,37 +232,51 @@ class _AlatListScreenState extends State<AlatListScreen> {
               childAspectRatio: 0.6,
             ),
             itemCount: _filteredAlatList.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (itemContext, index) {
               final alat = _filteredAlatList[index];
-              final desc = alat.deskripsi.isNotEmpty
-                  ? alat.deskripsi
+              final desc = alat.spesifikasi.isNotEmpty
+                  ? alat.spesifikasi
                   : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor';
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.black.withValues(alpha: 0.05),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCheckeredImageHeader(height: 120),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              return GestureDetector(
+                onTap: () {
+                  AlatDetailModal.show(context, alat: alat);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.black.withValues(alpha: 0.05),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (alat.firstFoto != null)
+                          Image.network(
+                            alat.firstFoto!,
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildCheckeredImageHeader(height: 120),
+                          )
+                        else
+                          _buildCheckeredImageHeader(height: 120),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                alat.nama,
+                                alat.namaAlat,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -282,21 +308,21 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                         onPressed: () async {
                                           final confirm = await showDialog<bool>(
                                             context: context,
-                                            builder: (context) => AlertDialog(
+                                            builder: (dialogContext) => AlertDialog(
                                               title: const Text('Hapus Alat'),
                                               content: Text(
-                                                'Apakah Anda yakin ingin menghapus "${alat.nama}"?',
+                                                'Apakah Anda yakin ingin menghapus "${alat.namaAlat}"?',
                                               ),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () => Navigator.of(
-                                                    context,
+                                                    dialogContext,
                                                   ).pop(false),
                                                   child: const Text('Batal'),
                                                 ),
                                                 TextButton(
                                                   onPressed: () => Navigator.of(
-                                                    context,
+                                                    dialogContext,
                                                   ).pop(true),
                                                   child: const Text(
                                                     'Hapus',
@@ -311,32 +337,30 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                           if (confirm == true) {
                                             setState(() => _isLoading = true);
                                             final res = await ApiService.delete(
-                                              'api/alat/${alat.id}',
+                                              'api/alat',
+                                              {'id': alat.id},
                                             );
-                                            setState(() => _isLoading = false);
+                                            if (!mounted) return;
                                             if (res.status == 'success') {
-                                              if (mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'Alat berhasil dihapus',
-                                                    ),
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Alat berhasil dihapus',
                                                   ),
-                                                );
-                                              }
-                                              _fetchAlat();
+                                                ),
+                                              );
+                                              await _fetchAlat();
                                             } else {
-                                              if (mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(res.message),
-                                                  ),
-                                                );
-                                              }
+                                              setState(() => _isLoading = false);
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(res.message),
+                                                ),
+                                              );
                                             }
                                           }
                                         },
@@ -372,7 +396,10 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                           await Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (_) =>
-                                                  AlatFormScreen(alat: alat),
+                                                  AlatFormScreen(
+                                                    alat: alat,
+                                                    availableCategories: _filters.where((f) => f != 'Semua').toList(),
+                                                  ),
                                             ),
                                           );
                                           _fetchAlat();
@@ -407,7 +434,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ],
                   ),
                 ),
-              );
+              ));
             },
           );
 
@@ -415,7 +442,9 @@ class _AlatListScreenState extends State<AlatListScreen> {
       onPressed: () async {
         await Navigator.of(
           context,
-        ).push(MaterialPageRoute(builder: (_) => const AlatFormScreen()));
+        ).push(MaterialPageRoute(builder: (_) => AlatFormScreen(
+          availableCategories: _filters.where((f) => f != 'Semua').toList(),
+        )));
         _fetchAlat();
       },
       backgroundColor: AppColors.secondary,
@@ -424,35 +453,50 @@ class _AlatListScreenState extends State<AlatListScreen> {
       child: const Icon(Icons.add, size: 28),
     );
 
-    if (widget.isTab) {
-      return Scaffold(
-        backgroundColor: AppColors.darkSurface,
-        body: RefreshIndicator(
-          onRefresh: _fetchAlat,
-          color: AppColors.primaryDark,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(children: [searchAndFilterHeader, gridContent]),
-          ),
-        ),
-        floatingActionButton: fab,
-      );
-    }
-
     return Scaffold(
       backgroundColor: AppColors.darkSurface,
-      appBar: AppBar(
-        title: const Text('Katalog'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.black,
-        elevation: 0,
-      ),
       body: RefreshIndicator(
         onRefresh: _fetchAlat,
         color: AppColors.primaryDark,
-        child: SingleChildScrollView(
+        notificationPredicate: (n) => n.depth == 0 && _allowRefresh,
+        child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(children: [searchAndFilterHeader, gridContent]),
+          slivers: [
+            SliverAppBar(
+              leading: !widget.isTab
+                  ? IconButton(
+                      icon: const Icon(Icons.arrow_back, color: AppColors.black),
+                      onPressed: () => Navigator.of(context).pop(),
+                    )
+                  : null,
+              title: const Text(
+                'Katalog',
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              backgroundColor: AppColors.white,
+              elevation: 0,
+              pinned: true,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(124),
+                child: Container(
+                  color: AppColors.darkSurface,
+                  child: searchAndFilterHeader,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Listener(
+                onPointerDown: (_) => _allowRefresh = false,
+                onPointerUp: (_) => _allowRefresh = true,
+                onPointerCancel: (_) => _allowRefresh = true,
+                child: Column(children: [gridContent]),
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: fab,

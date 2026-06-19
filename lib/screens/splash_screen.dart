@@ -4,6 +4,7 @@ import 'auth/login_screen.dart';
 import 'admin/admin_dashboard.dart';
 import 'user/user_dashboard.dart';
 import 'package:project_uas/core/app_colors.dart';
+import '../core/cookie_handler.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -47,7 +48,12 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkSession() async {
-    await Future.delayed(const Duration(seconds: 3));
+    // 1. Ambil cookie dari InfinityFree secara background terlebih dahulu
+    await CookieHandler.fetchInfinityCookie();
+    
+    // 2. Tunggu sisa durasi (bisa disesuaikan jika splash terlalu lama)
+    await Future.delayed(const Duration(seconds: 1));
+    
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final role = prefs.getString('role');

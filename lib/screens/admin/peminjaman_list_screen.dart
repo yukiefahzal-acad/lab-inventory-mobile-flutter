@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/api_service.dart';
 import '../../core/app_colors.dart';
 import '../../models/models.dart';
+import '../../widgets/alat_detail_modal.dart';
 
 // ─────────────────────────────────────────────────────────────────
 // Data model yang menggabungkan peminjaman + denda (bila ada)
@@ -23,13 +24,13 @@ class PeminjamanItem {
     if (denda != null) {
       return denda!.status == 'paid' ? 'lunas' : 'denda';
     }
-    switch (peminjaman.status) {
-      case 'active':
-        return 'aktif';
-      case 'pending':
-        return 'belum_verifikasi';
-      default:
-        return 'selesai';
+    final s = peminjaman.status.toLowerCase();
+    if (s == 'disetujui' || s == 'active') {
+      return 'aktif';
+    } else if (s == 'menunggu' || s == 'pending') {
+      return 'belum_verifikasi';
+    } else {
+      return 'selesai';
     }
   }
 }
@@ -49,6 +50,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   List<PeminjamanItem> _items = [];
   List<PeminjamanItem> _filtered = [];
   bool _isLoading = true;
+  bool _allowRefresh = true;
   final TextEditingController _searchCtrl = TextEditingController();
 
   @override
@@ -69,10 +71,15 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
     final q = _searchCtrl.text.toLowerCase();
     setState(() {
       _filtered = _items.where((item) {
-        const name =
-            'pinaya agustin'; // placeholder — ganti dengan nama nyata dari API
-        final code = 'UNI-00${item.peminjaman.id ?? 0}';
-        return name.contains(q) || code.contains(q);
+        final studentName = (item.peminjaman.namaMahasiswa ?? '').toLowerCase();
+        final loanIdStr = 'uni-00${item.peminjaman.id ?? 0}';
+        final cachedAlat = Alat.cache[item.peminjaman.alatId];
+        final toolName =
+            (cachedAlat?.namaAlat ?? item.peminjaman.namaAlat ?? '')
+                .toLowerCase();
+        return studentName.contains(q) ||
+            loanIdStr.contains(q) ||
+            toolName.contains(q);
       }).toList();
     });
   }
@@ -80,84 +87,31 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
 
-    // Fetch peminjaman & denda secara paralel
-    final peminjamanRes = await ApiService.get('api/admin/peminjaman');
+    // Fetch peminjaman, denda, & alat secara paralel
+    final peminjamanRes = await ApiService.get('api/peminjaman/riwayat');
     final dendaRes = await ApiService.get('api/admin/denda');
+    final alatRes = await ApiService.get('api/alat');
 
     List<Peminjaman> peminjamanList = [];
     List<Denda> dendaList = [];
 
-    if (peminjamanRes.status == 'success' && peminjamanRes.data != null) {
-      final List<dynamic> data = peminjamanRes.data;
-      peminjamanList = data.map((e) => Peminjaman.fromJson(e)).toList();
-    }
-    if (dendaRes.status == 'success' && dendaRes.data != null) {
-      final List<dynamic> data = dendaRes.data;
-      dendaList = data.map((e) => Denda.fromJson(e)).toList();
+    if (alatRes.status == 'success' && alatRes.data != null) {
+      final data = alatRes.data;
+      final List<dynamic> listData = data is Map ? (data['data'] ?? []) : data;
+      for (final e in listData) {
+        Alat.fromJson(e); // This populates Alat.cache
+      }
     }
 
-    // Fallback simulation data
-    if (peminjamanList.isEmpty) {
-      peminjamanList = [
-        Peminjaman(
-          id: 1,
-          userId: 1,
-          alatId: 1,
-          tanggalPinjam: '01/05/2026',
-          tanggalKembali: '05/05/2026',
-          status: 'denda',
-        ),
-        Peminjaman(
-          id: 2,
-          userId: 2,
-          alatId: 2,
-          tanggalPinjam: '10/05/2026',
-          tanggalKembali: '15/05/2026',
-          status: 'lunas',
-        ),
-        Peminjaman(
-          id: 3,
-          userId: 3,
-          alatId: 1,
-          tanggalPinjam: '20/05/2026',
-          tanggalKembali: '25/05/2026',
-          status: 'active',
-        ),
-        Peminjaman(
-          id: 4,
-          userId: 4,
-          alatId: 2,
-          tanggalPinjam: '28/05/2026',
-          tanggalKembali: '02/06/2026',
-          status: 'pending',
-        ),
-        Peminjaman(
-          id: 5,
-          userId: 5,
-          alatId: 1,
-          tanggalPinjam: '01/04/2026',
-          tanggalKembali: '05/04/2026',
-          status: 'returned',
-        ),
-      ];
+    if (peminjamanRes.status == 'success' && peminjamanRes.data != null) {
+      final data = peminjamanRes.data;
+      final List<dynamic> listData = data is Map ? (data['data'] ?? []) : data;
+      peminjamanList = listData.map((e) => Peminjaman.fromJson(e)).toList();
     }
-    if (dendaList.isEmpty) {
-      dendaList = [
-        Denda(
-          id: 1,
-          userId: 1,
-          peminjamanId: 1,
-          jumlah: 200000,
-          status: 'unpaid',
-        ),
-        Denda(
-          id: 2,
-          userId: 2,
-          peminjamanId: 2,
-          jumlah: 200000,
-          status: 'paid',
-        ),
-      ];
+    if (dendaRes.status == 'success' && dendaRes.data != null) {
+      final data = dendaRes.data;
+      final List<dynamic> listData = data is Map ? (data['data'] ?? []) : data;
+      dendaList = listData.map((e) => Denda.fromJson(e)).toList();
     }
 
     // Gabungkan peminjaman + denda berdasarkan peminjamanId dengan tipe yang jelas
@@ -176,7 +130,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   }
 
   Future<void> _setLunas(int dendaId) async {
-    final res = await ApiService.put('api/admin/denda/$dendaId/lunas', {});
+    final res = await ApiService.put('api/admin/denda/lunas', {'id': dendaId});
     if (res.status == 'success') {
       await _fetchData();
       if (mounted) {
@@ -186,9 +140,9 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(res.message)));
       }
     }
   }
@@ -270,9 +224,26 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
       case 'belum_verifikasi':
         _showQRModal(item, isKembali: false);
         break;
-      default:
+      case 'lunas':
+      case 'selesai':
+        _showPeminjamanDetailModal(item);
         break;
     }
+  }
+
+  // ─── Modal: Detail Peminjaman (Selesai / Lunas) ─────────────────
+  void _showPeminjamanDetailModal(PeminjamanItem item) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) =>
+          _PeminjamanDetailModal(item: item, buildCheckered: _buildCheckered),
+    );
   }
 
   // ─── Modal: Denda (Riwayat-1) ──────────────────────────────────
@@ -281,8 +252,12 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      builder: (_) => _DendaModal(
+      backgroundColor: AppColors.white,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => DendaModal(
         item: item,
         denda: denda,
         buildCheckered: _buildCheckered,
@@ -301,7 +276,11 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
+      backgroundColor: AppColors.white,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) => _QRDetailModal(
         item: item,
         isKembali: isKembali,
@@ -326,205 +305,223 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final listBody = Column(
-      children: [
-        // Search bar
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+    final searchBar = Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
-            child: TextField(
-              controller: _searchCtrl,
-              style: const TextStyle(color: AppColors.black87),
-              decoration: const InputDecoration(
-                hintText: 'Cari...',
-                hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
-                prefixIcon: SizedBox(width: 8),
-                suffixIcon: Icon(Icons.search, color: AppColors.black54),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14),
-              ),
-            ),
+          ],
+        ),
+        child: TextField(
+          controller: _searchCtrl,
+          style: const TextStyle(color: AppColors.black87),
+          decoration: const InputDecoration(
+            hintText: 'Cari...',
+            hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
+            prefixIcon: SizedBox(width: 8),
+            suffixIcon: Icon(Icons.search, color: AppColors.black54),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(vertical: 14),
           ),
         ),
-
-        // Card list container
-        Expanded(
-          child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryLight,
-                  ),
-                )
-              : _filtered.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Tidak ada data peminjaman.',
-                    style: TextStyle(
-                      color: AppColors.primaryDark,
-                      fontSize: 16,
-                    ),
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _fetchData,
-                  color: AppColors.primaryDark,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: List.generate(_filtered.length, (index) {
-                          final item = _filtered[index];
-                          final isLast = index == _filtered.length - 1;
-                          final isClickable =
-                              item.visualStatus == 'denda' ||
-                              item.visualStatus == 'aktif' ||
-                              item.visualStatus == 'belum_verifikasi';
-
-                          return Column(
-                            children: [
-                              InkWell(
-                                onTap: isClickable
-                                    ? () => _onItemTap(item)
-                                    : null,
-                                borderRadius: BorderRadius.vertical(
-                                  top: index == 0
-                                      ? const Radius.circular(20)
-                                      : Radius.zero,
-                                  bottom: isLast
-                                      ? const Radius.circular(20)
-                                      : Radius.zero,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      _buildCheckered(
-                                        width: 60,
-                                        height: 60,
-                                        radius: 8,
-                                      ),
-                                      const SizedBox(width: 14),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Pinaya Agustin',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.black,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              'Kode: UNI-00${item.peminjaman.id ?? 0}',
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: AppColors.black54,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            const Text(
-                                              'Terlambat: X Hari',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: AppColors.black54,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          if (item.denda != null) ...[
-                                            Text(
-                                              'Rp ${_formatCurrency(item.denda!.jumlah.toDouble())}',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    item.visualStatus == 'lunas'
-                                                    ? AppColors.successDark
-                                                    : AppColors.error,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 6),
-                                          ],
-                                          _buildBadge(item.visualStatus),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (!isLast)
-                                const Divider(
-                                  height: 1,
-                                  indent: 16,
-                                  endIndent: 16,
-                                  color: AppColors.grey200,
-                                ),
-                            ],
-                          );
-                        }),
-                      ),
-                    ),
-                  ),
-                ),
-        ),
-      ],
+      ),
     );
 
-    if (widget.isTab) {
-      return Scaffold(backgroundColor: AppColors.darkSurface, body: listBody);
-    }
+    final listContent = _isLoading
+        ? const SliverFillRemaining(
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.primaryLight),
+            ),
+          )
+        : _filtered.isEmpty
+        ? const SliverFillRemaining(
+            child: Center(
+              child: Text(
+                'tidak ada data peminjaman',
+                style: TextStyle(color: AppColors.primaryDark, fontSize: 16),
+              ),
+            ),
+          )
+        : SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            sliver: SliverToBoxAdapter(
+              child: Listener(
+                onPointerDown: (_) => _allowRefresh = false,
+                onPointerUp: (_) => _allowRefresh = true,
+                onPointerCancel: (_) => _allowRefresh = true,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: List.generate(_filtered.length, (index) {
+                      final item = _filtered[index];
+                      final isLast = index == _filtered.length - 1;
+                      final cachedAlat = Alat.cache[item.peminjaman.alatId];
+                      final firstFoto = cachedAlat?.firstFoto;
+
+                      return Column(
+                        children: [
+                          InkWell(
+                            onTap: () => _onItemTap(item),
+                            borderRadius: BorderRadius.vertical(
+                              top: index == 0
+                                  ? const Radius.circular(20)
+                                  : Radius.zero,
+                              bottom: isLast
+                                  ? const Radius.circular(20)
+                                  : Radius.zero,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              child: Row(
+                                children: [
+                                  if (firstFoto != null && firstFoto.isNotEmpty)
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        firstFoto,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                _buildCheckered(
+                                                  width: 60,
+                                                  height: 60,
+                                                  radius: 8,
+                                                ),
+                                      ),
+                                    )
+                                  else
+                                    _buildCheckered(
+                                      width: 60,
+                                      height: 60,
+                                      radius: 8,
+                                    ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          cachedAlat?.namaAlat ??
+                                              item.peminjaman.namaAlat ??
+                                              'Peminjaman #${item.peminjaman.id ?? 0}',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.black,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Peminjam: ${item.peminjaman.namaMahasiswa ?? 'Mahasiswa'}',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: AppColors.black54,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      if (item.denda != null) ...[
+                                        Text(
+                                          'Rp ${_formatCurrency(item.denda!.jumlah.toDouble())}',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: item.visualStatus == 'lunas'
+                                                ? AppColors.successDark
+                                                : AppColors.error,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                      ],
+                                      _buildBadge(item.visualStatus),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (!isLast)
+                            const Divider(
+                              height: 1,
+                              indent: 16,
+                              endIndent: 16,
+                              color: AppColors.grey200,
+                            ),
+                        ],
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ),
+          );
 
     return Scaffold(
       backgroundColor: AppColors.darkSurface,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.black),
-          onPressed: () => Navigator.pop(context),
+      body: RefreshIndicator(
+        onRefresh: _fetchData,
+        color: AppColors.primaryDark,
+        notificationPredicate: (n) => n.depth == 0 && _allowRefresh,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              leading: !widget.isTab
+                  ? IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.black,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  : null,
+              title: const Text(
+                'List Peminjaman',
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              backgroundColor: AppColors.white,
+              elevation: 0,
+              pinned: true,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(76),
+                child: Container(
+                  color: AppColors.darkSurface,
+                  width: double.infinity,
+                  child: searchBar,
+                ),
+              ),
+            ),
+            listContent,
+          ],
         ),
-        title: const Text(
-          'List Peminjaman',
-          style: TextStyle(
-            color: AppColors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        backgroundColor: AppColors.white,
-        elevation: 0,
       ),
-      body: listBody,
     );
   }
 }
@@ -532,14 +529,14 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
 // ─────────────────────────────────────────────────────────────────
 // Modal: Denda Detail (Riwayat-1.png)
 // ─────────────────────────────────────────────────────────────────
-class _DendaModal extends StatelessWidget {
+class DendaModal extends StatelessWidget {
   final PeminjamanItem item;
   final Denda denda;
   final Widget Function({double width, double height, double radius})
   buildCheckered;
   final VoidCallback onLunas;
 
-  const _DendaModal({
+  const DendaModal({
     required this.item,
     required this.denda,
     required this.buildCheckered,
@@ -588,234 +585,214 @@ class _DendaModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.88,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      builder: (_, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.grey300,
-                  borderRadius: BorderRadius.circular(2),
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 10,
+        bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
+              ],
+            ),
+            child: Row(
+              children: [
+                (() {
+                  final cachedAlat = Alat.cache[item.peminjaman.alatId];
+                  final firstFoto = cachedAlat?.firstFoto;
+                  if (firstFoto != null && firstFoto.isNotEmpty) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        firstFoto,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            buildCheckered(width: 60, height: 60, radius: 8),
+                      ),
+                    );
+                  }
+                  return buildCheckered(width: 60, height: 60, radius: 8);
+                })(),
+                const SizedBox(width: 14),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.black.withValues(alpha: 0.06),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            buildCheckered(width: 60, height: 60, radius: 8),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Pinaya Agustin',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Kode: UNI-00${item.peminjaman.id ?? 0}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.black54,
-                                    ),
-                                  ),
-                                  const Text(
-                                    'Terlambat: X Hari',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'Rp ${_formatCurrency(denda.jumlah.toDouble())}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.error,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.errorBg,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    'Denda',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.error,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: buildCheckered(
-                            width: double.infinity,
-                            height: 200,
-                            radius: 12,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'Nama Alat',
-                          style: TextStyle(
-                            fontSize: 24,
+                      (() {
+                        final cachedAlat = Alat.cache[item.peminjaman.alatId];
+                        return Text(
+                          cachedAlat?.namaAlat ??
+                              item.peminjaman.namaAlat ??
+                              'Peminjaman #${item.peminjaman.id ?? 0}',
+                          style: const TextStyle(
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        );
+                      })(),
+                      Text(
+                        'Peminjam: ${item.peminjaman.namaMahasiswa ?? 'Mahasiswa'}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.black54,
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
-                        child: Text(
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.black54,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      _infoRow(
-                        label: 'Tanggal Pinjam',
-                        value: item.peminjaman.tanggalPinjam.isEmpty
-                            ? 'DD / MM / YYYY'
-                            : item.peminjaman.tanggalPinjam,
-                      ),
-                      const SizedBox(height: 12),
-                      _infoRow(
-                        label: 'Tanggal Kembali',
-                        value: item.peminjaman.tanggalKembali.isEmpty
-                            ? 'DD / MM / YYYY'
-                            : item.peminjaman.tanggalKembali,
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Jumlah',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.black26),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text(
-                                '50',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: onLunas,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.success,
-                              foregroundColor: AppColors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: const Text(
-                              'Lunas',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
-              ),
-            ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Rp ${_formatCurrency(denda.jumlah.toDouble())}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.error,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.errorBg,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Denda',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 24),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: (() {
+              final cachedAlat = Alat.cache[item.peminjaman.alatId];
+              final firstFoto = cachedAlat?.firstFoto;
+              if (firstFoto != null && firstFoto.isNotEmpty) {
+                return Image.network(
+                  firstFoto,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => buildCheckered(
+                    width: double.infinity,
+                    height: 200,
+                    radius: 12,
+                  ),
+                );
+              }
+              return buildCheckered(
+                width: double.infinity,
+                height: 200,
+                radius: 12,
+              );
+            })(),
+          ),
+          const SizedBox(height: 20),
+          _infoRow(
+            label: 'Tanggal Pinjam',
+            value: item.peminjaman.tanggalPinjam.isEmpty
+                ? 'DD / MM / YYYY'
+                : item.peminjaman.tanggalPinjam,
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            label: 'Tanggal Kembali',
+            value: item.peminjaman.tanggalKembali.isEmpty
+                ? 'DD / MM / YYYY'
+                : item.peminjaman.tanggalKembali,
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Jumlah',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.black26),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${item.peminjaman.jumlah}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: onLunas,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.success,
+                foregroundColor: AppColors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: const Text(
+                'Lunas',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
     );
   }
 }
@@ -841,15 +818,297 @@ class _QRDetailModal extends StatefulWidget {
   State<_QRDetailModal> createState() => _QRDetailModalState();
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Modal: Detail Peminjaman (Selesai / Lunas)
+// ─────────────────────────────────────────────────────────────────
+class _PeminjamanDetailModal extends StatelessWidget {
+  final PeminjamanItem item;
+  final Widget Function({double width, double height, double radius})
+  buildCheckered;
+
+  const _PeminjamanDetailModal({
+    required this.item,
+    required this.buildCheckered,
+  });
+
+  Widget _infoRow({
+    required String label,
+    required String value,
+    bool isMultiLine = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: isMultiLine
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.black26),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.black26),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cachedAlat = Alat.cache[item.peminjaman.alatId];
+    final firstFoto = cachedAlat?.firstFoto;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 10,
+        bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (firstFoto != null && firstFoto.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      firstFoto,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          buildCheckered(width: 80, height: 80, radius: 8),
+                    ),
+                  )
+                else
+                  buildCheckered(width: 80, height: 80, radius: 8),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cachedAlat?.namaAlat ??
+                            item.peminjaman.namaAlat ??
+                            'Peminjaman #${item.peminjaman.id ?? 0}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        cachedAlat?.spesifikasi ?? '-',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.black54,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          _infoRow(
+            label: 'Tanggal Pinjam',
+            value: item.peminjaman.tanggalPinjam.isEmpty
+                ? '-'
+                : item.peminjaman.tanggalPinjam,
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            label: 'Tanggal Kembali Aktual',
+            value: item.peminjaman.tanggalKembaliAktual ?? '-',
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            label: 'Jumlah Dipinjam',
+            value: '${item.peminjaman.jumlah}',
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            label: 'Jumlah Kembali',
+            value: '${item.peminjaman.jumlahKembali ?? '-'}',
+          ),
+          const SizedBox(height: 12),
+          if (item.peminjaman.catatanPinjaman != null &&
+              item.peminjaman.catatanPinjaman!.isNotEmpty) ...[
+            _infoRow(
+              label: 'Catatan Pinjam',
+              value: item.peminjaman.catatanPinjaman!,
+              isMultiLine: true,
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (item.peminjaman.catatanPengembalian != null &&
+              item.peminjaman.catatanPengembalian!.isNotEmpty) ...[
+            _infoRow(
+              label: 'Catatan Pengembalian',
+              value: item.peminjaman.catatanPengembalian!,
+              isMultiLine: true,
+            ),
+            const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
 class _QRDetailModalState extends State<_QRDetailModal> {
-  bool _dendaRusak = false;
-  bool _dendaTelat = false;
+  String _kondisiAlat = 'baik';
   final TextEditingController _catatanCtrl = TextEditingController();
+  late final TextEditingController _jumlahKembaliCtrl;
+  late final TextEditingController _catatanKembaliCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _jumlahKembaliCtrl = TextEditingController(
+      text: widget.item.peminjaman.jumlah.toString(),
+    );
+    _catatanKembaliCtrl = TextEditingController(text: '');
+  }
 
   @override
   void dispose() {
     _catatanCtrl.dispose();
+    _jumlahKembaliCtrl.dispose();
+    _catatanKembaliCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitVerifikasi() async {
+    final isKembali = widget.isKembali;
+    final peminjamanId = widget.item.peminjaman.id;
+
+    if (isKembali) {
+      final now = DateTime.now();
+
+      final res = await ApiService.post('api/pengembalian', {
+        'peminjaman_id': peminjamanId,
+        'tanggal_kembali_aktual':
+            "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}",
+        'kondisi_alat': _kondisiAlat,
+        'jumlah_kembali':
+            int.tryParse(_jumlahKembaliCtrl.text) ??
+            widget.item.peminjaman.jumlah,
+        'catatan_pengembalian': _catatanKembaliCtrl.text,
+      });
+
+      if (res.status == 'success') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Pengembalian berhasil diverifikasi.'),
+            ),
+          );
+        }
+        widget.onVerifikasi();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
+          );
+        }
+      }
+    } else {
+      final res = await ApiService.put('api/peminjaman/persetujuan', {
+        'id': peminjamanId,
+        'status': 'Disetujui',
+        'catatan_pinjaman': _catatanCtrl.text,
+      });
+
+      if (res.status == 'success') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Pinjaman berhasil disetujui.')),
+          );
+        }
+        widget.onVerifikasi();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
+          );
+        }
+      }
+    }
   }
 
   Widget _infoRow({required String label, required String value}) {
@@ -886,303 +1145,388 @@ class _QRDetailModalState extends State<_QRDetailModal> {
   Widget build(BuildContext context) {
     final isKembali = widget.isKembali;
     final item = widget.item;
+    final cachedAlat = Alat.cache[item.peminjaman.alatId];
+    final firstFoto = cachedAlat?.firstFoto;
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      builder: (_, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 10,
+        bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: (() {
+              if (firstFoto != null && firstFoto.isNotEmpty) {
+                return Image.network(
+                  firstFoto,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      widget.buildCheckered(
+                        width: double.infinity,
+                        height: 200,
+                        radius: 12,
+                      ),
+                );
+              }
+              return widget.buildCheckered(
+                width: double.infinity,
+                height: 200,
+                radius: 12,
+              );
+            })(),
           ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.grey300,
-                  borderRadius: BorderRadius.circular(2),
+          const SizedBox(height: 20),
+          Text(
+            cachedAlat?.namaAlat ?? item.peminjaman.namaAlat ?? 'Nama Alat',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.black,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            cachedAlat?.spesifikasi ?? 'Tidak ada deskripsi spesifikasi.',
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.black54,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 24),
+          _infoRow(
+            label: 'Peminjam',
+            value: item.peminjaman.namaMahasiswa ?? '-',
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            label: 'Tanggal Pinjam',
+            value: item.peminjaman.tanggalPinjam.isEmpty
+                ? 'DD / MM / YYYY'
+                : item.peminjaman.tanggalPinjam,
+          ),
+          const SizedBox(height: 12),
+          _infoRow(
+            label: 'Tanggal Kembali',
+            value: item.peminjaman.tanggalKembali.isEmpty
+                ? 'DD / MM / YYYY'
+                : item.peminjaman.tanggalKembali,
+          ),
+          const SizedBox(height: 20),
+          if (isKembali) ...[
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+              child: Text(
+                'Catatan alat:',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 12, 16, 0),
-                // child: Row(
-                //   children: [
-                //     IconButton(
-                //       icon: const Icon(Icons.arrow_back, color: AppColors.black),
-                //       onPressed: () => Navigator.pop(context),
-                //     ),
-                //     const Text(
-                //       'Scan QR',
-                //       style: TextStyle(
-                //         fontSize: 18,
-                //         fontWeight: FontWeight.bold,
-                //         color: AppColors.black,
-                //       ),
-                //     ),
-                //   ],
-                // ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                item.peminjaman.catatanPinjaman == null ||
+                        item.peminjaman.catatanPinjaman!.isEmpty
+                    ? '-'
+                    : item.peminjaman.catatanPinjaman!,
+                style: const TextStyle(fontSize: 14, color: AppColors.black54),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Kondisi Alat (Denda)',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
                     children: [
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: widget.buildCheckered(
-                            width: double.infinity,
-                            height: 200,
-                            radius: 12,
-                          ),
+                      ChoiceChip(
+                        label: const Text('Baik'),
+                        selected: _kondisiAlat == 'baik',
+                        selectedColor: AppColors.successBg,
+                        labelStyle: TextStyle(
+                          color: _kondisiAlat == 'baik'
+                              ? AppColors.successDark
+                              : AppColors.black87,
+                          fontWeight: FontWeight.bold,
                         ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() => _kondisiAlat = 'baik');
+                          }
+                        },
                       ),
-                      const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'Nama Alat',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.black,
-                          ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Rusak'),
+                        selected: _kondisiAlat == 'rusak',
+                        selectedColor: AppColors.errorBg,
+                        labelStyle: TextStyle(
+                          color: _kondisiAlat == 'rusak'
+                              ? AppColors.error
+                              : AppColors.black87,
+                          fontWeight: FontWeight.bold,
                         ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() => _kondisiAlat = 'rusak');
+                          }
+                        },
                       ),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
-                        child: Text(
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.black54,
-                            height: 1.4,
-                          ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Hilang'),
+                        selected: _kondisiAlat == 'hilang',
+                        selectedColor: AppColors.errorBg,
+                        labelStyle: TextStyle(
+                          color: _kondisiAlat == 'hilang'
+                              ? AppColors.error
+                              : AppColors.black87,
+                          fontWeight: FontWeight.bold,
                         ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() => _kondisiAlat = 'hilang');
+                          }
+                        },
                       ),
-                      const SizedBox(height: 24),
-                      _infoRow(
-                        label: 'Tanggal Pinjam',
-                        value: item.peminjaman.tanggalPinjam.isEmpty
-                            ? 'DD / MM / YYYY'
-                            : item.peminjaman.tanggalPinjam,
-                      ),
-                      const SizedBox(height: 12),
-                      _infoRow(
-                        label: 'Tanggal Kembali',
-                        value: item.peminjaman.tanggalKembali.isEmpty
-                            ? 'DD / MM / YYYY'
-                            : item.peminjaman.tanggalKembali,
-                      ),
-                      const SizedBox(height: 20),
-                      if (isKembali) ...[
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
-                          child: Text(
-                            'Catatan alat:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.black,
-                            ),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'Bolong pada bagian bawah kiri',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.black54,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Denda',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                              const Spacer(),
-                              GestureDetector(
-                                onTap: () =>
-                                    setState(() => _dendaRusak = !_dendaRusak),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _dendaRusak
-                                        ? AppColors.errorBg
-                                        : AppColors.errorBg,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    'Rusak',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.error,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              GestureDetector(
-                                onTap: () =>
-                                    setState(() => _dendaTelat = !_dendaTelat),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _dendaTelat
-                                        ? AppColors.errorBg
-                                        : AppColors.errorBg,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    'Telat',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.error,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(
-                                Icons.keyboard_arrow_down,
-                                color: AppColors.black45,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      if (!isKembali) ...[
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-                          child: Text(
-                            'Catatan Alat',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.black,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.black26),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: TextField(
-                              controller: _catatanCtrl,
-                              maxLines: 4,
-                              decoration: const InputDecoration(
-                                hintText: 'Isi catatan alat disini...',
-                                hintStyle: TextStyle(color: AppColors.black38),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.all(14),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Jumlah',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.black26),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text(
-                                '50',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: widget.onVerifikasi,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isKembali
-                                  ? AppColors.warning
-                                  : AppColors.warningDark,
-                              foregroundColor: AppColors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Text(
-                              isKembali
-                                  ? 'Verifikasi Pengembalian'
-                                  : 'Verifikasi Pinjaman',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
                     ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                'Catatan Pengembalian',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.black26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TextField(
+                  controller: _catatanKembaliCtrl,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: 'Isi catatan pengembalian disini...',
+                    hintStyle: TextStyle(color: AppColors.black38),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(14),
                   ),
                 ),
               ),
-            ],
+            ),
+          ],
+          if (!isKembali) ...[
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                'Catatan Alat',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.black26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TextField(
+                  controller: _catatanCtrl,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: 'Isi catatan alat disini...',
+                    hintStyle: TextStyle(color: AppColors.black38),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isKembali ? 'Jumlah Pinjam' : 'Jumlah',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.black26),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${item.peminjaman.jumlah}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        );
-      },
+          if (isKembali) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Jumlah Kembali',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.remove_circle_outline,
+                          color: AppColors.primaryDark,
+                        ),
+                        onPressed: () {
+                          final currentVal =
+                              int.tryParse(_jumlahKembaliCtrl.text) ??
+                              widget.item.peminjaman.jumlah;
+                          if (currentVal > 0) {
+                            setState(() {
+                              _jumlahKembaliCtrl.text = (currentVal - 1)
+                                  .toString();
+                            });
+                          }
+                        },
+                      ),
+                      Container(
+                        width: 60,
+                        height: 40,
+                        alignment: Alignment.center,
+                        child: TextField(
+                          controller: _jumlahKembaliCtrl,
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.black,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: AppColors.black26,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primaryDark,
+                        ),
+                        onPressed: () {
+                          final currentVal =
+                              int.tryParse(_jumlahKembaliCtrl.text) ??
+                              widget.item.peminjaman.jumlah;
+                          if (currentVal < widget.item.peminjaman.jumlah) {
+                            setState(() {
+                              _jumlahKembaliCtrl.text = (currentVal + 1)
+                                  .toString();
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 28),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _submitVerifikasi,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isKembali
+                      ? AppColors.warning
+                      : AppColors.warningDark,
+                  foregroundColor: AppColors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Text(
+                  isKembali ? 'Verifikasi Pengembalian' : 'Verifikasi Pinjaman',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
     );
   }
 }

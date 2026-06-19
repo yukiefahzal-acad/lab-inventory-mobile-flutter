@@ -30,20 +30,18 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     super.dispose();
   }
 
-  Future<void> _submitPeminjaman(int alatId, int jumlah) async {
+  Future<void> _submitPeminjaman(
+    int alatId,
+    int jumlah,
+    String tanggalPinjam,
+    String tanggalKembali,
+  ) async {
     setState(() => _isProcessing = true);
 
-    final now = DateTime.now();
-    final formattedPinjam =
-        "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
-    final returnDate = now.add(const Duration(days: 3));
-    final formattedKembali =
-        "${returnDate.month.toString().padLeft(2, '0')}/${returnDate.day.toString().padLeft(2, '0')}/${returnDate.year}";
-
-    final res = await ApiService.post('api/peminjaman', {
+    final res = await ApiService.post('api/booking', {
       'alat_id': alatId,
-      'tanggal_pinjam': formattedPinjam,
-      'tanggal_kembali': formattedKembali,
+      'tanggal_pinjam': tanggalPinjam,
+      'tanggal_kembali_rencana': tanggalKembali,
       'jumlah': jumlah,
     });
 
@@ -62,9 +60,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         _controller.start();
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(res.message)));
       _controller.start();
     }
   }
@@ -82,28 +80,25 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
       if (widget.action == 'booking') {
         try {
-          final res = await ApiService.get('api/alat');
+          final res = await ApiService.post('api/scan', {'qr_code': qrCode});
           Alat? selectedAlat;
           if (res.status == 'success' && res.data != null) {
-            final List<dynamic> data = res.data;
-            final List<Alat> list = data.map((e) => Alat.fromJson(e)).toList();
-            for (var alat in list) {
-              if (alat.qrCode == qrCode || alat.id.toString() == qrCode) {
-                selectedAlat = alat;
-                break;
-              }
+            final data = res.data is Map && res.data.containsKey('data')
+                ? res.data['data']
+                : res.data;
+            if (data is Map<String, dynamic>) {
+              selectedAlat = Alat.fromJson(data);
             }
           }
 
           if (selectedAlat == null) {
-            selectedAlat = Alat(
-              id: 1,
-              nama: 'Proyektor Epson',
-              deskripsi:
-                  'Proyektor LCD Epson berkinerja tinggi. Sangat cocok untuk kebutuhan presentasi di ruang kelas atau ruang rapat.',
-              statusAwal: '15',
-              qrCode: qrCode,
-            );
+            if (!mounted) return;
+            setState(() => _isProcessing = false);
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(res.message)));
+            _controller.start();
+            return;
           }
 
           if (!mounted) return;
@@ -112,16 +107,19 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           await AlatDetailModal.show(
             context,
             alat: selectedAlat,
-            onSubmit: (alatId, quantity) async {
-              await _submitPeminjaman(alatId, quantity);
+            onSubmit: (alatId, quantity, tanggalPinjam, tanggalKembali) async {
+              await _submitPeminjaman(
+                alatId,
+                quantity,
+                tanggalPinjam,
+                tanggalKembali,
+              );
             },
           );
 
           _controller.start();
         } catch (e) {
-          // Pengecekan mounted ditambahkan untuk menghindari exception
           if (!mounted) return;
-
           setState(() => _isProcessing = false);
           ScaffoldMessenger.of(
             context,
@@ -129,26 +127,42 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           _controller.start();
         }
       } else if (widget.action == 'return') {
-        final res = await ApiService.post('api/pengembalian', {
-          'qr_code': qrCode,
-        });
+        try {
+          // First scan to identify the alat
+          final scanRes = await ApiService.post('api/scan', {
+            'qr_code': qrCode,
+          });
+          Alat? scannedAlat;
+          if (scanRes.status == 'success' && scanRes.data != null) {
+            final data = scanRes.data is Map && scanRes.data.containsKey('data')
+                ? scanRes.data['data']
+                : scanRes.data;
+            if (data is Map<String, dynamic>) {
+              scannedAlat = Alat.fromJson(data);
+            }
+          }
 
-        if (!mounted) return;
-        setState(() => _isProcessing = false);
+          if (!mounted) return;
 
-        if (res.status == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Alat berhasil dikembalikan.')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
-          );
-        }
+          if (scannedAlat == null) {
+            setState(() => _isProcessing = false);
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(scanRes.message)));
+            _controller.start();
+            return;
+          }
 
-        if (!widget.isTab) {
-          Navigator.of(context).pop();
-        } else {
+          // Show detail modal for verification (admin return)
+          setState(() => _isProcessing = false);
+          await AlatDetailModal.show(context, alat: scannedAlat);
+          _controller.start();
+        } catch (e) {
+          if (!mounted) return;
+          setState(() => _isProcessing = false);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
           _controller.start();
         }
       }
@@ -158,7 +172,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkSurface,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: widget.isTab
             ? null
@@ -181,70 +195,69 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         children: [
           MobileScanner(controller: _controller, onDetect: _handleScan),
 
-          // Sesuai kode modern Flutter Anda yang benar
-          Container(color: AppColors.darkSurface.withValues(alpha: 0.55)),
-
+          // Transparent cutout overlay with white border
           Center(
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.8),
+                  width: 5.0,
+                ),
+                boxShadow: [
+                  BoxShadow(color: Colors.transparent, spreadRadius: 9999),
+                ],
+              ),
+            ),
+          ),
+
+          // Text Elements
+          SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Scan QR Alat',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 260,
-                      height: 260,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.primaryLight.withValues(alpha: 0.4),
-                          width: 1,
-                        ),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    Container(
-                      width: 230,
-                      height: 230,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.primaryLight,
-                          width: 3.5,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 35),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.black.withValues(alpha: 0.65),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Text(
-                    'Pastikan kode QR berada di tengah',
+                const SizedBox(height: 40),
+                const Center(
+                  child: Text(
+                    'Scan QR Alat',
                     style: TextStyle(
                       color: AppColors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black54,
+                          blurRadius: 10,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+                const Spacer(),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.black.withValues(alpha: 0.65),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Text(
+                      'Pastikan kode QR berada di tengah',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 60),
               ],
             ),
           ),
