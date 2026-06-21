@@ -7,7 +7,13 @@ class AlatDetailModal {
   static Future<void> show(
     BuildContext context, {
     required Alat alat,
-    Future<void> Function(int alatId, int quantity, String tanggalPinjam, String tanggalKembali)? onSubmit,
+    Future<void> Function(
+      int alatId,
+      int quantity,
+      String tanggalPinjam,
+      String tanggalKembali,
+    )?
+    onSubmit,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -21,7 +27,11 @@ class AlatDetailModal {
         int currentImageIndex = 0;
         final PageController pageController = PageController();
         int quantity = 1;
-        final DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        final DateTime today = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+        );
         DateTime tanggalPinjam = today;
         DateTime tanggalKembali = today.add(const Duration(days: 3));
 
@@ -32,14 +42,15 @@ class AlatDetailModal {
                 left: 20,
                 right: 20,
                 top: 10,
-                bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+                bottom:
+                    20 +
+                    MediaQuery.of(context).viewInsets.bottom +
+                    MediaQuery.of(context).padding.bottom,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
-
                   // Gallery Carousel
                   Stack(
                     alignment: Alignment.center,
@@ -198,22 +209,24 @@ class AlatDetailModal {
                   ),
                   const SizedBox(height: 8),
                   _buildDendaRow(
-                    'Denda per hari',
+                    'Denda per hari (Rp)',
                     'Rp ${_formatCurrency(alat.dendaPerHari)}',
                   ),
                   const SizedBox(height: 4),
                   _buildDendaRow(
-                    'Denda rusak',
+                    'Denda rusak (Rp)',
                     'Rp ${_formatCurrency(alat.dendaRusak)}',
                   ),
                   const SizedBox(height: 4),
                   _buildDendaRow(
-                    'Denda hilang',
+                    'Denda hilang (Rp)',
                     'Rp ${_formatCurrency(alat.dendaHilang)}',
                   ),
                   const SizedBox(height: 20),
 
-                  if (onSubmit == null && alat.qrCode != null && alat.qrCode!.isNotEmpty) ...[
+                  if (onSubmit == null &&
+                      alat.qrCode != null &&
+                      alat.qrCode!.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     const Center(
                       child: Text(
@@ -254,7 +267,7 @@ class AlatDetailModal {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Mulai Pinjam',
+                                'Tanggal Pinjam',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.grey,
@@ -268,31 +281,52 @@ class AlatDetailModal {
                                     context: context,
                                     initialDate: tanggalPinjam,
                                     firstDate: today,
-                                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                                    lastDate: DateTime.now().add(
+                                      const Duration(days: 365),
+                                    ),
                                   );
                                   if (picked != null) {
                                     setModalState(() {
                                       tanggalPinjam = picked;
-                                      if (tanggalKembali.isBefore(tanggalPinjam)) {
-                                        tanggalKembali = tanggalPinjam.add(const Duration(days: 1));
+                                      if (tanggalKembali.isBefore(
+                                        tanggalPinjam,
+                                      )) {
+                                        tanggalKembali = tanggalPinjam.add(
+                                          const Duration(days: 1),
+                                        );
                                       }
                                     });
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 12,
+                                  ),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
+                                    border: Border.all(
+                                      color: AppColors.grey.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "${tanggalPinjam.year}-${tanggalPinjam.month.toString().padLeft(2, '0')}-${tanggalPinjam.day.toString().padLeft(2, '0')}",
-                                        style: const TextStyle(fontSize: 14, color: AppColors.black),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.black,
+                                        ),
                                       ),
-                                      const Icon(Icons.calendar_today, size: 18, color: AppColors.primaryDark),
+                                      const Icon(
+                                        Icons.calendar_today,
+                                        size: 18,
+                                        color: AppColors.primaryDark,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -306,7 +340,7 @@ class AlatDetailModal {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Batas Kembali',
+                                'Tanggal Kembali',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.grey,
@@ -320,7 +354,9 @@ class AlatDetailModal {
                                     context: context,
                                     initialDate: tanggalKembali,
                                     firstDate: tanggalPinjam,
-                                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                                    lastDate: DateTime.now().add(
+                                      const Duration(days: 365),
+                                    ),
                                   );
                                   if (picked != null) {
                                     setModalState(() {
@@ -329,19 +365,34 @@ class AlatDetailModal {
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 12,
+                                  ),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
+                                    border: Border.all(
+                                      color: AppColors.grey.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "${tanggalKembali.year}-${tanggalKembali.month.toString().padLeft(2, '0')}-${tanggalKembali.day.toString().padLeft(2, '0')}",
-                                        style: const TextStyle(fontSize: 14, color: AppColors.black),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.black,
+                                        ),
                                       ),
-                                      const Icon(Icons.calendar_today, size: 18, color: AppColors.primaryDark),
+                                      const Icon(
+                                        Icons.calendar_today,
+                                        size: 18,
+                                        color: AppColors.primaryDark,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -422,8 +473,10 @@ class AlatDetailModal {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        final fmtPinjam = "${tanggalPinjam.year}-${tanggalPinjam.month.toString().padLeft(2, '0')}-${tanggalPinjam.day.toString().padLeft(2, '0')}";
-                        final fmtKembali = "${tanggalKembali.year}-${tanggalKembali.month.toString().padLeft(2, '0')}-${tanggalKembali.day.toString().padLeft(2, '0')}";
+                        final fmtPinjam =
+                            "${tanggalPinjam.year}-${tanggalPinjam.month.toString().padLeft(2, '0')}-${tanggalPinjam.day.toString().padLeft(2, '0')}";
+                        final fmtKembali =
+                            "${tanggalKembali.year}-${tanggalKembali.month.toString().padLeft(2, '0')}-${tanggalKembali.day.toString().padLeft(2, '0')}";
                         onSubmit(alat.id ?? 1, quantity, fmtPinjam, fmtKembali);
                       },
                       style: ElevatedButton.styleFrom(

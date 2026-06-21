@@ -151,7 +151,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   Widget _buildBadge(String visualStatus) {
     switch (visualStatus) {
       case 'denda':
-        return _badge('Denda', AppColors.errorBg, AppColors.error);
+        return _badge('Belum Lunas', AppColors.errorBg, AppColors.error);
       case 'lunas':
         return _badge('Lunas', AppColors.successBg, AppColors.successDark);
       case 'aktif':
@@ -337,7 +337,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
     final listContent = _isLoading
         ? const SliverFillRemaining(
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.primaryLight),
+              child: CircularProgressIndicator(color: AppColors.primaryDark),
             ),
           )
         : _filtered.isEmpty
@@ -499,7 +499,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                     )
                   : null,
               title: const Text(
-                'List Peminjaman',
+                'Manajemen Peminjaman',
                 style: TextStyle(
                   color: AppColors.black,
                   fontWeight: FontWeight.bold,
@@ -567,16 +567,9 @@ class DendaModal extends StatelessWidget {
               color: AppColors.black,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.black26),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 14, color: AppColors.black87),
-            ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 14, color: AppColors.black87),
           ),
         ],
       ),
@@ -590,7 +583,10 @@ class DendaModal extends StatelessWidget {
         left: 20,
         right: 20,
         top: 10,
-        bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+        bottom:
+            20 +
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -744,27 +740,16 @@ class DendaModal extends StatelessWidget {
                 const Text(
                   'Jumlah',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.black,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.black26),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '${item.peminjaman.jumlah}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.black,
-                    ),
+                Text(
+                  '${item.peminjaman.jumlah}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.black87,
                   ),
                 ),
               ],
@@ -851,22 +836,11 @@ class _PeminjamanDetailModal extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.black26),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.black87,
-                    ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.black87,
                   ),
                 ),
               ],
@@ -882,21 +856,11 @@ class _PeminjamanDetailModal extends StatelessWidget {
                     color: AppColors.black,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.black26),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.black87,
-                    ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.black87,
                   ),
                 ),
               ],
@@ -914,7 +878,10 @@ class _PeminjamanDetailModal extends StatelessWidget {
         left: 20,
         right: 20,
         top: 10,
-        bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+        bottom:
+            20 +
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1097,7 +1064,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
       if (res.status == 'success') {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Pinjaman berhasil disetujui.')),
+            const SnackBar(content: Text('Pinjaman berhasil disetujui.')),
           );
         }
         widget.onVerifikasi();
@@ -1107,6 +1074,30 @@ class _QRDetailModalState extends State<_QRDetailModal> {
             SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
           );
         }
+      }
+    }
+  }
+
+  Future<void> _submitTolak() async {
+    final peminjamanId = widget.item.peminjaman.id;
+    final res = await ApiService.put('api/peminjaman/persetujuan', {
+      'id': peminjamanId,
+      'status': 'Ditolak',
+      'catatan_pinjaman': _catatanCtrl.text,
+    });
+
+    if (res.status == 'success') {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pinjaman berhasil ditolak.')),
+        );
+      }
+      widget.onVerifikasi();
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res.message ?? 'Terjadi kesalahan')),
+        );
       }
     }
   }
@@ -1125,16 +1116,9 @@ class _QRDetailModalState extends State<_QRDetailModal> {
               color: AppColors.black,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.black26),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 14, color: AppColors.black87),
-            ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 14, color: AppColors.black87),
           ),
         ],
       ),
@@ -1153,7 +1137,10 @@ class _QRDetailModalState extends State<_QRDetailModal> {
         left: 20,
         right: 20,
         top: 10,
-        bottom: 20 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+        bottom:
+            20 +
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1339,7 +1326,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                   controller: _catatanKembaliCtrl,
                   maxLines: 4,
                   decoration: const InputDecoration(
-                    hintText: 'Isi catatan pengembalian disini...',
+                    hintText: 'Tambahkan catatan jika diperlukan...',
                     hintStyle: TextStyle(color: AppColors.black38),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(14),
@@ -1352,7 +1339,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Text(
-                'Catatan Alat',
+                'Catatan (opsional)',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -1371,7 +1358,7 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                   controller: _catatanCtrl,
                   maxLines: 4,
                   decoration: const InputDecoration(
-                    hintText: 'Isi catatan alat disini...',
+                    hintText: 'Catatan (opsional)',
                     hintStyle: TextStyle(color: AppColors.black38),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(14),
@@ -1389,27 +1376,16 @@ class _QRDetailModalState extends State<_QRDetailModal> {
                 Text(
                   isKembali ? 'Jumlah Pinjam' : 'Jumlah',
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.black,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.black26),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '${item.peminjaman.jumlah}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.black,
-                    ),
+                Text(
+                  '${item.peminjaman.jumlah}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.black87,
                   ),
                 ),
               ],
@@ -1499,30 +1475,79 @@ class _QRDetailModalState extends State<_QRDetailModal> {
           const SizedBox(height: 28),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _submitVerifikasi,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isKembali
-                      ? AppColors.warning
-                      : AppColors.warningDark,
-                  foregroundColor: AppColors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+            child: isKembali 
+              ? SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _submitVerifikasi,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.warning,
+                      foregroundColor: AppColors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'Verifikasi Pengembalian',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: OutlinedButton(
+                          onPressed: _submitTolak,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColors.error),
+                            foregroundColor: AppColors.error,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Text(
+                            'Tolak',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: _submitVerifikasi,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.warningDark,
+                            foregroundColor: AppColors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Text(
+                            'Setujui',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: Text(
-                  isKembali ? 'Verifikasi Pengembalian' : 'Verifikasi Pinjaman',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
           ),
           const SizedBox(height: 32),
         ],

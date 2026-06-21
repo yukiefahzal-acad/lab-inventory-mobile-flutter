@@ -63,7 +63,7 @@ class _DendaListScreenState extends State<DendaListScreen> {
   Widget build(BuildContext context) {
     final bodyContent = _isLoading
         ? const Center(
-            child: CircularProgressIndicator(color: AppColors.primaryLight),
+            child: CircularProgressIndicator(color: AppColors.primaryDark),
           )
         : RefreshIndicator(
             onRefresh: _fetchDenda,

@@ -192,7 +192,7 @@ class Denda {
     return Denda(
       id: json['id'],
       userId: json['user_id'] ?? 0,
-      peminjamanId: json['peminjaman_id'] ?? 0,
+      peminjamanId: int.tryParse((json['peminjaman_id'] ?? 0).toString()) ?? 0,
       jumlah: jumlahVal,
       status: statusVal,
       jenisDenda: json['jenis_denda']?.toString(),

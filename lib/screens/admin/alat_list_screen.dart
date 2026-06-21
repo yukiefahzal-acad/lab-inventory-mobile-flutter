@@ -177,12 +177,12 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.secondary
+                          ? AppColors.primaryDark
                           : AppColors.transparent,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected
-                            ? AppColors.secondary
+                            ? AppColors.primaryDark
                             : AppColors.grey,
                         width: 1.5,
                       ),
@@ -209,7 +209,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
 
     final gridContent = _isLoading
         ? const Center(
-            child: CircularProgressIndicator(color: AppColors.primaryLight),
+            child: CircularProgressIndicator(color: AppColors.primaryDark),
           )
         : _filteredAlatList.isEmpty
         ? Center(
@@ -285,7 +285,30 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                   color: AppColors.black87,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                spacing: 4,
+                                runSpacing: 4,
+                                children: alat.kategoriList.map((c) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.grey200,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: AppColors.grey300),
+                                    ),
+                                    child: Text(
+                                      _capitalizeFirstLetter(c.trim()),
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.grey600,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 4),
                               Expanded(
                                 child: Text(
                                   desc,
@@ -301,6 +324,44 @@ class _AlatListScreenState extends State<AlatListScreen> {
                               const SizedBox(height: 8),
                               Row(
                                 children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 34,
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          await Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  AlatFormScreen(
+                                                    alat: alat,
+                                                    availableCategories: _filters.where((f) => f != 'Semua').toList(),
+                                                  ),
+                                            ),
+                                          );
+                                          _fetchAlat();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primaryDark,
+                                          foregroundColor: AppColors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                          elevation: 0,
+                                        ),
+                                        child: const Text(
+                                          'Ubah',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
                                   Expanded(
                                     child: SizedBox(
                                       height: 34,
@@ -387,44 +448,6 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 34,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          await Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  AlatFormScreen(
-                                                    alat: alat,
-                                                    availableCategories: _filters.where((f) => f != 'Semua').toList(),
-                                                  ),
-                                            ),
-                                          );
-                                          _fetchAlat();
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.secondary,
-                                          foregroundColor: AppColors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                          elevation: 0,
-                                        ),
-                                        child: const Text(
-                                          'Ubah',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ],
@@ -434,8 +457,9 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ],
                   ),
                 ),
-              ));
-            },
+              ),
+            );
+          },
           );
 
     final fab = FloatingActionButton(
@@ -447,7 +471,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
         )));
         _fetchAlat();
       },
-      backgroundColor: AppColors.secondary,
+      backgroundColor: AppColors.primaryDark,
       foregroundColor: AppColors.white,
       shape: const CircleBorder(),
       child: const Icon(Icons.add, size: 28),

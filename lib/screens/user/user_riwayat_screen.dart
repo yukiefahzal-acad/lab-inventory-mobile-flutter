@@ -13,6 +13,7 @@ class UserRiwayatScreen extends StatefulWidget {
 
 class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
   List<Peminjaman> _allLoansList = [];
+  Map<int, Denda> _userDendaMap = {};
   bool _isLoading = true;
   bool _allowRefresh = true;
   final TextEditingController _historySearchCtrl = TextEditingController();
@@ -37,14 +38,31 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
   Future<void> _fetchRiwayat({bool showLoading = true}) async {
     if (showLoading) setState(() => _isLoading = true);
     final res = await ApiService.get('api/peminjaman/riwayat');
+    final resDenda = await ApiService.get('api/user/denda');
+    
     if (res.status == 'success' && res.data != null) {
       final data = res.data;
       final List<dynamic> listData = data is Map ? (data['data'] ?? []) : data;
+      
+      Map<int, Denda> dendaMap = {};
+      if (resDenda.status == 'success' && resDenda.data != null) {
+        final dataDenda = resDenda.data;
+        final List<dynamic> listDenda = dataDenda is Map ? (dataDenda['data'] ?? []) : dataDenda;
+        final dendas = listDenda.map((e) => Denda.fromJson(e)).toList();
+        for (final d in dendas) {
+          dendaMap[d.peminjamanId] = d;
+        }
+      }
+
       setState(() {
         _allLoansList = listData.map((e) => Peminjaman.fromJson(e)).toList();
+        _userDendaMap = dendaMap;
       });
     } else {
-      setState(() => _allLoansList = []);
+      setState(() {
+        _allLoansList = [];
+        _userDendaMap = {};
+      });
     }
     if (showLoading) setState(() => _isLoading = false);
   }
@@ -116,8 +134,12 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
       case 'disetujui':
         return AppColors.success;
       case 'ditolak':
+      case 'denda':
+      case 'belum lunas':
         return AppColors.error;
       case 'dikembalikan':
+      case 'selesai':
+      case 'lunas':
         return AppColors.success;
       case 'menunggu':
       case 'pending':
@@ -213,7 +235,19 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                   final name = loan.namaAlat ?? 'Nama Alat';
                                   final qty = 'x${loan.jumlah}';
 
-                                  final leftText = 'Status: ${loan.status}';
+                                  String statusDisplay = loan.status;
+                                  final denda = _userDendaMap[loan.id];
+                                  if (denda != null) {
+                                    statusDisplay = denda.status == 'paid' ? 'Lunas' : 'Belum Lunas';
+                                  } else {
+                                    final s = statusDisplay.toLowerCase();
+                                    if (s == 'dikembalikan') statusDisplay = 'Selesai';
+                                    else if (s == 'disetujui') statusDisplay = 'Aktif';
+                                    else if (s == 'denda') statusDisplay = 'Belum Lunas';
+                                    else if (s.isNotEmpty) statusDisplay = s[0].toUpperCase() + s.substring(1);
+                                  }
+
+                                  final leftText = 'Status: $statusDisplay';
                                   final rightText = 'Pinjam: ${loan.tanggalPinjam}';
 
                                   return GestureDetector(
@@ -296,7 +330,7 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                                       style: TextStyle(
                                                         fontSize: 13,
                                                         fontWeight: FontWeight.bold,
-                                                        color: _getStatusColor(loan.status),
+                                                        color: _getStatusColor(statusDisplay),
                                                       ),
                                                     ),
                                                     Text(

@@ -266,7 +266,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             Container(
               color: AppColors.black.withValues(alpha: 0.5),
               child: const Center(
-                child: CircularProgressIndicator(color: AppColors.primaryLight),
+                child: CircularProgressIndicator(color: AppColors.primaryDark),
               ),
             ),
         ],

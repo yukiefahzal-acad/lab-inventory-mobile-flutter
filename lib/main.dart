@@ -22,6 +22,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         useMaterial3: true,
         textTheme: GoogleFonts.manropeTextTheme(),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: AppColors.primaryDark,
+        ),
       ),
       home: const SplashScreen(),
     );

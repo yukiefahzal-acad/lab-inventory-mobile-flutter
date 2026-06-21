@@ -37,7 +37,14 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
 
   String _capitalizeFirstLetter(String text) {
     if (text.isEmpty) return text;
-    return text.split(' ').map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' : '').join(' ');
+    return text
+        .split(' ')
+        .map(
+          (word) => word.isNotEmpty
+              ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+              : '',
+        )
+        .join(' ');
   }
 
   Future<void> _fetchAlat({bool showLoading = true}) async {
@@ -50,7 +57,9 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
       final Set<String> uniqueCats = {};
       for (final alat in parsed) {
         uniqueCats.addAll(
-          alat.kategoriList.map((c) => _capitalizeFirstLetter(c.trim())).where((c) => c.isNotEmpty),
+          alat.kategoriList
+              .map((c) => _capitalizeFirstLetter(c.trim()))
+              .where((c) => c.isNotEmpty),
         );
       }
 
@@ -153,7 +162,8 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
           : RefreshIndicator(
               onRefresh: () => _fetchAlat(showLoading: false),
               color: AppColors.primary,
-              notificationPredicate: (n) => (n.depth == 0 || n.depth == 1) && _allowRefresh,
+              notificationPredicate: (n) =>
+                  (n.depth == 0 || n.depth == 1) && _allowRefresh,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
@@ -178,29 +188,29 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.black.withValues(alpha: 0.05),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0,
+                              ),
+                              child: TextField(
+                                controller: _searchCtrl,
+                                style: const TextStyle(
+                                  color: AppColors.black87,
                                 ),
-                                child: TextField(
-                                  controller: _searchCtrl,
-                                  style: const TextStyle(color: AppColors.black87),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Cari alat',
-                                    hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
-                                    prefixIcon: SizedBox(width: 8),
-                                    suffixIcon: Icon(Icons.search, color: AppColors.black54),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                                decoration: InputDecoration(
+                                  hintText: 'Cari alat',
+                                  suffixIcon: const Icon(
+                                    Icons.search,
+                                    color: AppColors.black,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
                                   ),
                                 ),
                               ),
@@ -210,7 +220,9 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                               height: 40,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
                                 itemCount: _categories.length,
                                 itemBuilder: (context, index) {
                                   final cat = _categories[index];
@@ -230,12 +242,14 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: isActive
-                                              ? AppColors.secondary
+                                              ? AppColors.primaryDark
                                               : AppColors.transparent,
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                           border: Border.all(
                                             color: isActive
-                                                ? AppColors.secondary
+                                                ? AppColors.primaryDark
                                                 : AppColors.grey,
                                             width: 1.5,
                                           ),
@@ -263,7 +277,10 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      // vertical: 16.0,
+                    ),
                     sliver: SliverToBoxAdapter(
                       child: Listener(
                         onPointerDown: (_) => _allowRefresh = false,
@@ -303,7 +320,8 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                       ? alat.spesifikasi
                                       : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor';
                                   return GestureDetector(
-                                    onTap: () => _showAlatDetailModal(context, alat),
+                                    onTap: () =>
+                                        _showAlatDetailModal(context, alat),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: AppColors.white,
@@ -321,7 +339,8 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(16),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             if (alat.firstFoto != null)
                                               Image.network(
@@ -330,11 +349,14 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                                 width: double.infinity,
                                                 fit: BoxFit.cover,
                                                 errorBuilder:
-                                                    (context, error, stackTrace) =>
-                                                        _buildPlaceholderImage(
-                                                          width: double.infinity,
-                                                          height: 120,
-                                                        ),
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) => _buildPlaceholderImage(
+                                                      width: double.infinity,
+                                                      height: 120,
+                                                    ),
                                               )
                                             else
                                               _buildPlaceholderImage(
@@ -343,37 +365,76 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                               ),
                                             Expanded(
                                               child: Padding(
-                                                padding: const EdgeInsets.all(12.0),
+                                                padding: const EdgeInsets.all(
+                                                  12.0,
+                                                ),
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.spaceBetween,
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Column(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         Text(
                                                           alat.namaAlat,
                                                           maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          style: const TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: AppColors.black87,
-                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: AppColors
+                                                                    .black87,
+                                                              ),
                                                         ),
-                                                        const SizedBox(height: 6),
+                                                        const SizedBox(
+                                                          height: 4,
+                                                        ),
+                                                        Wrap(
+                                                          spacing: 4,
+                                                          runSpacing: 4,
+                                                          children: alat.kategoriList.map((c) {
+                                                            return Container(
+                                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                              decoration: BoxDecoration(
+                                                                color: AppColors.grey200,
+                                                                borderRadius: BorderRadius.circular(10),
+                                                                border: Border.all(color: AppColors.grey300),
+                                                              ),
+                                                              child: Text(
+                                                                _capitalizeFirstLetter(c.trim()),
+                                                                style: const TextStyle(
+                                                                  fontSize: 10,
+                                                                  fontWeight: FontWeight.w600,
+                                                                  color: AppColors.grey600,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          }).toList(),
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 4,
+                                                        ),
                                                         Text(
                                                           desc,
                                                           maxLines: 3,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          style: const TextStyle(
-                                                            color: AppColors.grey600,
-                                                            fontSize: 11,
-                                                            height: 1.3,
-                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                                color: AppColors
+                                                                    .grey600,
+                                                                fontSize: 11,
+                                                                height: 1.3,
+                                                              ),
                                                         ),
                                                       ],
                                                     ),
@@ -387,22 +448,27 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                                         backgroundColor:
                                                             AppColors.authBgTop,
                                                         foregroundColor:
-                                                            AppColors.textPrimary,
+                                                            AppColors
+                                                                .textPrimary,
                                                         minimumSize: const Size(
                                                           double.infinity,
                                                           34,
                                                         ),
                                                         shape: RoundedRectangleBorder(
                                                           borderRadius:
-                                                              BorderRadius.circular(10),
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
                                                         ),
-                                                        padding: EdgeInsets.zero,
+                                                        padding:
+                                                            EdgeInsets.zero,
                                                       ),
                                                       child: const Text(
                                                         'Detail Alat',
                                                         style: TextStyle(
                                                           fontSize: 12,
-                                                          fontWeight: FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
                                                     ),
@@ -434,7 +500,7 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
             ),
           );
         },
-        backgroundColor: AppColors.secondary,
+        backgroundColor: AppColors.primaryDark,
         foregroundColor: AppColors.white,
         shape: const CircleBorder(),
         child: const Icon(Icons.qr_code_scanner, size: 28),

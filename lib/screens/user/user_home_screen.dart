@@ -184,7 +184,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           onPressed: widget.onNavigateToRiwayat,
                           style: TextButton.styleFrom(
                             backgroundColor: AppColors.white,
-                            foregroundColor: AppColors.secondary,
+                            foregroundColor: AppColors.primaryDark,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
                               vertical: 6,
@@ -192,7 +192,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                               side: const BorderSide(
-                                color: AppColors.secondary,
+                                color: AppColors.primaryDark,
                                 width: 1.5,
                               ),
                             ),

@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Brand / Theme Colors
   static const Color primary = Color(0xFFAEE2FF); // Light blue
-  static const Color secondary = Color(0xFF9FA1FF); // Purple-blue
-  static const Color secondaryLight = Color(0xFFB5BAFF); // Light Purple-blue
+  static const Color secondary = Color(0xFF64B5F6); // Medium blue
+  static const Color secondaryLight = Color(0xFF90CAF9); // Light blue
   static const Color accentGreen = Color(0xFFD9F9DF); // Light green
 
   static const Color primaryDark = Color(
     0xFF1E88E5,
   ); // Darker blue for text/icons on white bg
-  static const Color primaryLight = Color(0xFFC4BCE6);
-  static const Color primaryLightest = Color(0xFFEBE8F6);
+  static const Color primaryLight = Color(0xFFBBDEFB); // Light blue
+  static const Color primaryLightest = Color(0xFFE3F2FD); // Lightest blue
 
   // Gradient Colors for Auth Screens
   static const Color authBgTop = Color(0xFFAEE2FF);
-  static const Color authBgBottom = Color(0xFF9FA1FF);
+  static const Color authBgBottom = Color(0xFF1E88E5); // Blue gradient bottom
 
   // Status & Feedback Colors
   // Error
@@ -35,8 +35,8 @@ class AppColors {
 
   // Layout & Neutral Colors
   static const Color darkSurface = Color(0xFFAEE2FF);
-  static const Color surfaceLight = Color(0xFFF3F1FA);
-  static const Color surfaceLightest = Color(0xFFF9F7FD);
+  static const Color surfaceLight = Color(0xFFF3F8FF); // Light blue tint
+  static const Color surfaceLightest = Color(0xFFF9FBFF); // Lightest blue tint
   static const Color backgroundDefault = Color(0xFFFCFAFF);
 
   // Text & Core Neutrals
@@ -65,7 +65,7 @@ class AppColors {
   static const Color grey200 = Color(0xFFEEEEEE);
   static const Color grey300 = Color(0xFFE0E0E0);
   static const Color grey600 = Color(0xFF757575);
-  static const Color greyLightest = Color(0xFFEDE9F6);
+  static const Color greyLightest = Color(0xFFF5F9FF);
 
   // Legacy/Fallback colors mapped
   static const Color red = Color(0xFFF44336);

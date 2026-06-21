@@ -175,11 +175,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return CircleAvatar(
       radius: radius,
       backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-      child: Icon(
-        Icons.person,
-        size: radius * 1.2,
-        color: AppColors.primary,
-      ),
+      child: Icon(Icons.person, size: radius * 1.2, color: AppColors.primary),
     );
   }
 
@@ -268,15 +264,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
             backgroundColor: AppColors.white,
             elevation: 0,
             pinned: true,
-            actions: [
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_none_outlined,
-                  color: AppColors.black,
-                ),
-                onPressed: () {},
-              ),
-            ],
           ),
           if (_isHomeLoading)
             const SliverFillRemaining(
@@ -286,89 +273,89 @@ class _AdminDashboardState extends State<AdminDashboard> {
             SliverPadding(
               padding: const EdgeInsets.all(20),
               sliver: SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Text
-                  Text(
-                    'Selamat datang, $_adminName',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Kelola peminjaman alat dengan mudah.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Statistik Horizontal List
-                  const Text(
-                    'Statistik',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Listener(
-                    onPointerDown: (_) => _allowRefresh = false,
-                    onPointerUp: (_) => _allowRefresh = true,
-                    onPointerCancel: (_) => _allowRefresh = true,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          _buildStatCard(
-                            label: 'Total Alat',
-                            value: '$_totalAlat',
-                            icon: Icons.inventory_2_outlined,
-                            iconColor: AppColors.primary,
-                            textColor: AppColors.black,
-                          ),
-                          const SizedBox(width: 10),
-                          _buildStatCard(
-                            label: 'Pinjaman',
-                            value: '$_activeLoans',
-                            icon: Icons.outbox,
-                            iconColor: AppColors.success,
-                            textColor: AppColors.success,
-                          ),
-                          const SizedBox(width: 10),
-                          _buildStatCard(
-                            label: 'Pengembalian',
-                            value: '$_returnedCount',
-                            icon: Icons.move_to_inbox,
-                            iconColor: AppColors.warning,
-                            textColor: AppColors.warning,
-                          ),
-                          const SizedBox(width: 10),
-                          _buildStatCard(
-                            label: 'Total Denda',
-                            value: 'Rp ${_formatCurrency(_totalDenda)}',
-                            icon: Icons.report_problem_outlined,
-                            iconColor: AppColors.error,
-                            textColor: AppColors.error,
-                          ),
-                        ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Text
+                    Text(
+                      'Selamat datang, $_adminName',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Kelola peminjaman alat dengan mudah.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Statistik Horizontal List
+                    const Text(
+                      'Statistik',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Listener(
+                      onPointerDown: (_) => _allowRefresh = false,
+                      onPointerUp: (_) => _allowRefresh = true,
+                      onPointerCancel: (_) => _allowRefresh = true,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildStatCard(
+                              label: 'Total Alat',
+                              value: '$_totalAlat',
+                              icon: Icons.inventory_2_outlined,
+                              iconColor: AppColors.primary,
+                              textColor: AppColors.black,
+                            ),
+                            const SizedBox(width: 10),
+                            _buildStatCard(
+                              label: 'Pinjaman',
+                              value: '$_activeLoans',
+                              icon: Icons.outbox,
+                              iconColor: AppColors.success,
+                              textColor: AppColors.success,
+                            ),
+                            const SizedBox(width: 10),
+                            _buildStatCard(
+                              label: 'Pengembalian',
+                              value: '$_returnedCount',
+                              icon: Icons.move_to_inbox,
+                              iconColor: AppColors.warning,
+                              textColor: AppColors.warning,
+                            ),
+                            const SizedBox(width: 10),
+                            _buildStatCard(
+                              label: 'Total Denda',
+                              value: 'Rp ${_formatCurrency(_totalDenda)}',
+                              icon: Icons.report_problem_outlined,
+                              iconColor: AppColors.error,
+                              textColor: AppColors.error,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
 
                     // ── Pinjaman Aktif Section ──
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Pinjaman Aktif',
+                          'Peminjaman Aktif',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -383,7 +370,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           },
                           style: TextButton.styleFrom(
                             backgroundColor: AppColors.white,
-                            foregroundColor: AppColors.secondary,
+                            foregroundColor: AppColors.primaryDark,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
                               vertical: 6,
@@ -391,7 +378,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                               side: const BorderSide(
-                                color: AppColors.secondary,
+                                color: AppColors.primaryDark,
                                 width: 1.5,
                               ),
                             ),
@@ -422,7 +409,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       child: _activeLoanList.isEmpty
                           ? const Center(
                               child: Text(
-                                'Tidak ada pinjaman aktif',
+                                'Tidak ada peminjaman aktif',
                                 style: TextStyle(
                                   color: AppColors.grey,
                                   fontSize: 14,
@@ -620,32 +607,54 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                         backgroundColor: AppColors.white,
                                         showDragHandle: true,
                                         shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(24),
+                                          ),
                                         ),
                                         builder: (_) => DendaModal(
-                                          item: PeminjamanItem(peminjaman: p, denda: denda),
+                                          item: PeminjamanItem(
+                                            peminjaman: p,
+                                            denda: denda,
+                                          ),
                                           denda: denda,
-                                          buildCheckered: ({double width = 80, double height = 80, double radius = 8}) {
-                                            return _buildPlaceholderImage(width: width, height: height);
-                                          },
+                                          buildCheckered:
+                                              ({
+                                                double width = 80,
+                                                double height = 80,
+                                                double radius = 8,
+                                              }) {
+                                                return _buildPlaceholderImage(
+                                                  width: width,
+                                                  height: height,
+                                                );
+                                              },
                                           onLunas: () async {
                                             Navigator.of(context).pop();
-                                            final res = await ApiService.put('api/admin/denda/lunas', {
-                                              'id': denda.id,
-                                            });
+                                            final res = await ApiService.put(
+                                              'api/admin/denda/lunas',
+                                              {'id': denda.id},
+                                            );
                                             if (res.status == 'success') {
                                               if (mounted) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
                                                   const SnackBar(
-                                                    content: Text('Status denda diperbarui ke Lunas.'),
+                                                    content: Text(
+                                                      'Status denda diperbarui ke Lunas.',
+                                                    ),
                                                   ),
                                                 );
                                               }
                                               _fetchStats();
                                             } else {
                                               if (mounted) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(content: Text(res.message)),
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(res.message),
+                                                  ),
                                                 );
                                               }
                                             }
@@ -657,11 +666,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     child: Container(
                                       padding: const EdgeInsets.all(8),
                                       child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   denda.namaMahasiswa ?? 'User',
@@ -691,7 +702,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                             ),
                                           ),
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
                                               Text(
                                                 'Rp ${_formatCurrency(denda.jumlah.toInt())}',
@@ -702,24 +714,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                                 ),
                                               ),
                                               const SizedBox(height: 8),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 10,
-                                                  vertical: 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.errorBg,
-                                                  borderRadius: BorderRadius.circular(12),
-                                                ),
-                                                child: const Text(
-                                                  'Belum Lunas',
-                                                  style: TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors.error,
-                                                  ),
-                                                ),
-                                              ),
                                             ],
                                           ),
                                         ],
@@ -924,7 +918,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
-            label: 'Peminjaman',
+            label: 'Manajemen Peminjaman',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

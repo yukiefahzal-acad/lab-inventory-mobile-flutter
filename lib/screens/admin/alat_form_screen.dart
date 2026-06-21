@@ -17,7 +17,11 @@ class ImageSlot {
 class AlatFormScreen extends StatefulWidget {
   final Alat? alat;
   final List<String> availableCategories;
-  const AlatFormScreen({super.key, this.alat, this.availableCategories = const []});
+  const AlatFormScreen({
+    super.key,
+    this.alat,
+    this.availableCategories = const [],
+  });
 
   @override
   State<AlatFormScreen> createState() => _AlatFormScreenState();
@@ -50,8 +54,12 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
     _namaCtrl = TextEditingController(text: a?.namaAlat ?? '');
     _deskripsiCtrl = TextEditingController(text: a?.spesifikasi ?? '');
     _newKategoriCtrl = TextEditingController();
-    _selectedCategories = (a?.kategoriList ?? []).map(_capitalizeFirstLetter).toList();
-    _availableCategories = widget.availableCategories.map(_capitalizeFirstLetter).toList();
+    _selectedCategories = (a?.kategoriList ?? [])
+        .map(_capitalizeFirstLetter)
+        .toList();
+    _availableCategories = widget.availableCategories
+        .map(_capitalizeFirstLetter)
+        .toList();
 
     final fotoList = a?.fotoList ?? [];
     for (int i = 0; i < 6; i++) {
@@ -62,7 +70,9 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       }
     }
 
-    _stokCtrl = TextEditingController(text: a != null ? a.stokTotal.toString() : '20');
+    _stokCtrl = TextEditingController(
+      text: a != null ? a.stokTotal.toString() : '20',
+    );
     _dendaPerHariCtrl = TextEditingController(
       text: a != null ? _formatCurrency(a.dendaPerHari) : '10.000',
     );
@@ -89,8 +99,6 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
     return text[0].toUpperCase() + text.substring(1);
   }
 
-
-
   @override
   void dispose() {
     _kodeAlatCtrl.dispose();
@@ -105,9 +113,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
   }
 
   Future<void> _pickImageForSlot(int index) async {
-    final pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery,
-    );
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() {
@@ -120,7 +126,8 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || _selectedCategories.isEmpty) return;
+    if (!_formKey.currentState!.validate() || _selectedCategories.isEmpty)
+      return;
     setState(() => _isLoading = true);
 
     // Upload newly picked images and collect all URLs in order
@@ -144,7 +151,11 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
           setState(() => _isLoading = false);
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal upload gambar ke-${i + 1}: ${uploadRes.message}')),
+            SnackBar(
+              content: Text(
+                'Gagal upload gambar ke-${i + 1}: ${uploadRes.message}',
+              ),
+            ),
           );
           return;
         }
@@ -159,9 +170,21 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       'foto': fotoValue,
       'stok_total': int.tryParse(_stokCtrl.text) ?? 0,
       'kategori': _selectedCategories.map((c) => c.toLowerCase()).join('|'),
-      'denda_per_hari': int.tryParse(_dendaPerHariCtrl.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
-      'denda_rusak': int.tryParse(_dendaRusakCtrl.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
-      'denda_hilang': int.tryParse(_dendaHilangCtrl.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
+      'denda_per_hari':
+          int.tryParse(
+            _dendaPerHariCtrl.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          ) ??
+          0,
+      'denda_rusak':
+          int.tryParse(
+            _dendaRusakCtrl.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          ) ??
+          0,
+      'denda_hilang':
+          int.tryParse(
+            _dendaHilangCtrl.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          ) ??
+          0,
     };
 
     final ApiResponse<dynamic> res;
@@ -201,7 +224,12 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
       hasImage = true;
       content = ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: Image.memory(slot.pickedBytes!, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+        child: Image.memory(
+          slot.pickedBytes!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
       );
     } else if (slot.imageUrl != null && slot.imageUrl!.isNotEmpty) {
       hasImage = true;
@@ -212,12 +240,15 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
-          errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: AppColors.grey),
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.broken_image, color: AppColors.grey),
         ),
       );
     } else {
       // Find if this is the first empty slot to highlight it
-      final firstEmptyIndex = _imageSlots.indexWhere((s) => s.imageUrl == null && s.pickedFile == null);
+      final firstEmptyIndex = _imageSlots.indexWhere(
+        (s) => s.imageUrl == null && s.pickedFile == null,
+      );
       final isNextToFill = index == firstEmptyIndex;
       content = Center(
         child: CircleAvatar(
@@ -263,11 +294,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                   shape: BoxShape.circle,
                 ),
                 padding: const EdgeInsets.all(4),
-                child: const Icon(
-                  Icons.close,
-                  size: 14,
-                  color: Colors.white,
-                ),
+                child: const Icon(Icons.close, size: 14, color: Colors.white),
               ),
             ),
           ),
@@ -373,16 +400,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
               const Divider(color: AppColors.black12, thickness: 1),
               const SizedBox(height: 8),
 
-              // Identifikasi Alat
-              const Text(
-                'Identifikasi Alat',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: AppColors.black,
-                ),
-              ),
-              const SizedBox(height: 4),
+
 
               _buildFieldLabel('Kode Alat'),
               TextFormField(
@@ -422,7 +440,8 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                       onSelected: (selected) {
                         setState(() {
                           if (selected) {
-                            if (!_selectedCategories.contains(cat)) _selectedCategories.add(cat);
+                            if (!_selectedCategories.contains(cat))
+                              _selectedCategories.add(cat);
                           } else {
                             _selectedCategories.remove(cat);
                           }
@@ -464,17 +483,28 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.secondary,
                       foregroundColor: AppColors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Tambah', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'Tambah',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
               if (_selectedCategories.isEmpty)
                 const Padding(
                   padding: EdgeInsets.only(top: 8.0),
-                  child: Text('Wajib memilih minimal satu kategori', style: TextStyle(color: AppColors.error, fontSize: 12)),
+                  child: Text(
+                    'Wajib memilih minimal satu kategori',
+                    style: TextStyle(color: AppColors.error, fontSize: 12),
+                  ),
                 ),
 
               _buildFieldLabel('Stok'),
@@ -485,7 +515,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                 decoration: _buildInputDecoration(hintText: '20'),
               ),
 
-              _buildFieldLabel('Denda Per Hari'),
+              _buildFieldLabel('Denda Per Hari (Rp)'),
               TextFormField(
                 controller: _dendaPerHariCtrl,
                 style: const TextStyle(color: AppColors.black),
@@ -497,7 +527,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                 ),
               ),
 
-              _buildFieldLabel('Denda Rusak'),
+              _buildFieldLabel('Denda Rusak (Rp)'),
               TextFormField(
                 controller: _dendaRusakCtrl,
                 style: const TextStyle(color: AppColors.black),
@@ -509,7 +539,7 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
                 ),
               ),
 
-              _buildFieldLabel('Denda Hilang'),
+              _buildFieldLabel('Denda Hilang (Rp)'),
               TextFormField(
                 controller: _dendaHilangCtrl,
                 style: const TextStyle(color: AppColors.black),
@@ -582,11 +612,14 @@ class _AlatFormScreenState extends State<AlatFormScreen> {
 class _CurrencyInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue.copyWith(text: '');
     }
-    final intValue = int.tryParse(newValue.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    final intValue =
+        int.tryParse(newValue.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
     final str = intValue.toString();
     final buffer = StringBuffer();
     for (int i = 0; i < str.length; i++) {
@@ -595,7 +628,8 @@ class _CurrencyInputFormatter extends TextInputFormatter {
     }
     final newText = buffer.toString();
     return newValue.copyWith(
-        text: newText,
-        selection: TextSelection.collapsed(offset: newText.length));
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
   }
 }
