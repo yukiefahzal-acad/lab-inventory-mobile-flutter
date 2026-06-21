@@ -51,12 +51,16 @@ class _AlatListScreenState extends State<AlatListScreen> {
     if (res.status == 'success' && res.data != null) {
       final List<dynamic> data = res.data;
       final parsed = data.map((e) => Alat.fromJson(e)).toList();
-      
+
       final Set<String> uniqueCats = {};
       for (final alat in parsed) {
-        uniqueCats.addAll(alat.kategoriList.map((c) => _capitalizeFirstLetter(c.trim())).where((c) => c.isNotEmpty));
+        uniqueCats.addAll(
+          alat.kategoriList
+              .map((c) => _capitalizeFirstLetter(c.trim()))
+              .where((c) => c.isNotEmpty),
+        );
       }
-      
+
       if (mounted) {
         setState(() {
           _allAlatList = parsed;
@@ -86,8 +90,11 @@ class _AlatListScreenState extends State<AlatListScreen> {
           return matchesSearch;
         } else {
           if (_selectedFilterIndex < _filters.length) {
-            final selectedCategory = _filters[_selectedFilterIndex].toLowerCase();
-            final hasCategory = alat.kategoriList.any((c) => c.trim().toLowerCase() == selectedCategory);
+            final selectedCategory = _filters[_selectedFilterIndex]
+                .toLowerCase();
+            final hasCategory = alat.kategoriList.any(
+              (c) => c.trim().toLowerCase() == selectedCategory,
+            );
             return matchesSearch && hasCategory;
           }
           return matchesSearch;
@@ -177,18 +184,20 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary
+                          ? AppColors.primaryDark
                           : AppColors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: AppColors.primary,
+                        color: AppColors.primaryDark,
                         width: 1.5,
                       ),
                     ),
                     child: Text(
                       _filters[index],
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: isSelected
+                            ? AppColors.white
+                            : AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -270,133 +279,150 @@ class _AlatListScreenState extends State<AlatListScreen> {
                             padding: const EdgeInsets.all(12.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                alat.namaAlat,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: AppColors.black87,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Wrap(
-                                spacing: 4,
-                                runSpacing: 4,
-                                children: alat.kategoriList.map((c) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.grey200,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: AppColors.grey300),
-                                    ),
-                                    child: Text(
-                                      _capitalizeFirstLetter(c.trim()),
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.grey600,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 4),
-                              Expanded(
-                                child: Text(
-                                  desc,
-                                  maxLines: 3,
+                              children: [
+                                Text(
+                                  alat.namaAlat,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: AppColors.grey600,
-                                    fontSize: 11,
-                                    height: 1.3,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: AppColors.black87,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 34,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          await Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  AlatFormScreen(
-                                                    alat: alat,
-                                                    availableCategories: _filters.where((f) => f != 'Semua').toList(),
-                                                  ),
-                                            ),
-                                          );
-                                          _fetchAlat();
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primaryDark,
-                                          foregroundColor: AppColors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                          elevation: 0,
+                                const SizedBox(height: 4),
+                                Wrap(
+                                  spacing: 4,
+                                  runSpacing: 4,
+                                  children: alat.kategoriList.map((c) {
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.grey200,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: AppColors.grey300,
                                         ),
-                                        child: const Text(
-                                          'Ubah',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
+                                      ),
+                                      child: Text(
+                                        _capitalizeFirstLetter(c.trim()),
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.grey600,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                                const SizedBox(height: 4),
+                                Expanded(
+                                  child: Text(
+                                    desc,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppColors.grey600,
+                                      fontSize: 11,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 34,
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            await Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (_) => AlatFormScreen(
+                                                  alat: alat,
+                                                  availableCategories: _filters
+                                                      .where(
+                                                        (f) => f != 'Semua',
+                                                      )
+                                                      .toList(),
+                                                ),
+                                              ),
+                                            );
+                                            _fetchAlat();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                AppColors.primaryDark,
+                                            foregroundColor: AppColors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            padding: EdgeInsets.zero,
+                                            elevation: 0,
+                                          ),
+                                          child: const Text(
+                                            'Ubah',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 34,
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 34,
                                         child: ElevatedButton(
                                           onPressed: () async {
                                             final confirm = await showDialog<bool>(
                                               context: context,
-                                              builder: (dialogContext) => AlertDialog(
-                                                title: const Text('Hapus Alat'),
-                                                content: Text(
-                                                  'Apakah Anda yakin ingin menghapus "${alat.namaAlat}"?',
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () => Navigator.of(
-                                                      dialogContext,
-                                                    ).pop(false),
-                                                    child: const Text('Batal'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () => Navigator.of(
-                                                      dialogContext,
-                                                    ).pop(true),
-                                                    child: const Text(
-                                                      'Hapus',
-                                                      style: TextStyle(
-                                                        color: AppColors.red,
-                                                      ),
+                                              builder: (dialogContext) =>
+                                                  AlertDialog(
+                                                    title: const Text(
+                                                      'Hapus Alat',
                                                     ),
+                                                    content: Text(
+                                                      'Apakah Anda yakin ingin menghapus "${alat.namaAlat}"?',
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                              dialogContext,
+                                                            ).pop(false),
+                                                        child: const Text(
+                                                          'Batal',
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                              dialogContext,
+                                                            ).pop(true),
+                                                        child: const Text(
+                                                          'Hapus',
+                                                          style: TextStyle(
+                                                            color:
+                                                                AppColors.red,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
                                             );
                                             if (confirm == true) {
                                               setState(() => _isLoading = true);
-                                              final res = await ApiService.delete(
-                                                'api/alat',
-                                                {'id': alat.id},
-                                              );
+                                              final res =
+                                                  await ApiService.delete(
+                                                    'api/alat',
+                                                    {'id': alat.id},
+                                                  );
                                               if (!mounted) return;
                                               if (res.status == 'success') {
                                                 ScaffoldMessenger.of(
@@ -410,7 +436,9 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                                 );
                                                 await _fetchAlat();
                                               } else {
-                                                setState(() => _isLoading = false);
+                                                setState(
+                                                  () => _isLoading = false,
+                                                );
                                                 ScaffoldMessenger.of(
                                                   context,
                                                 ).showSnackBar(
@@ -425,7 +453,8 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                             backgroundColor: AppColors.error,
                                             foregroundColor: AppColors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             padding: EdgeInsets.zero,
                                             elevation: 0,
@@ -438,29 +467,31 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                             ),
                                           ),
                                         ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
           );
 
     final fab = FloatingActionButton(
       onPressed: () async {
-        await Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => AlatFormScreen(
-          availableCategories: _filters.where((f) => f != 'Semua').toList(),
-        )));
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => AlatFormScreen(
+              availableCategories: _filters.where((f) => f != 'Semua').toList(),
+            ),
+          ),
+        );
         _fetchAlat();
       },
       backgroundColor: AppColors.primaryDark,
@@ -481,7 +512,10 @@ class _AlatListScreenState extends State<AlatListScreen> {
             SliverAppBar(
               leading: !widget.isTab
                   ? IconButton(
-                      icon: const Icon(Icons.arrow_back, color: AppColors.black),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.black,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                     )
                   : null,

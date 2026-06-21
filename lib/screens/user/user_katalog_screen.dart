@@ -242,18 +242,22 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: isActive
-                                              ? AppColors.primary
+                                              ? AppColors.primaryDark
                                               : AppColors.transparent,
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                           border: Border.all(
-                                            color: AppColors.primary,
+                                            color: AppColors.primaryDark,
                                             width: 1.5,
                                           ),
                                         ),
                                         child: Text(
                                           cat,
-                                          style: const TextStyle(
-                                            color: AppColors.textPrimary,
+                                          style: TextStyle(
+                                            color: isActive
+                                                ? AppColors.white
+                                                : AppColors.textPrimary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
                                           ),
@@ -395,20 +399,39 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                                         Wrap(
                                                           spacing: 4,
                                                           runSpacing: 4,
-                                                          children: alat.kategoriList.map((c) {
+                                                          children: alat.kategoriList.map((
+                                                            c,
+                                                          ) {
                                                             return Container(
-                                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                              padding:
+                                                                  const EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        6,
+                                                                    vertical: 2,
+                                                                  ),
                                                               decoration: BoxDecoration(
-                                                                color: AppColors.grey200,
-                                                                borderRadius: BorderRadius.circular(10),
-                                                                border: Border.all(color: AppColors.grey300),
+                                                                color: AppColors
+                                                                    .grey200,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      10,
+                                                                    ),
+                                                                border: Border.all(
+                                                                  color: AppColors
+                                                                      .grey300,
+                                                                ),
                                                               ),
                                                               child: Text(
-                                                                _capitalizeFirstLetter(c.trim()),
+                                                                _capitalizeFirstLetter(
+                                                                  c.trim(),
+                                                                ),
                                                                 style: const TextStyle(
                                                                   fontSize: 10,
-                                                                  fontWeight: FontWeight.w600,
-                                                                  color: AppColors.grey600,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: AppColors
+                                                                      .grey600,
                                                                 ),
                                                               ),
                                                             );
