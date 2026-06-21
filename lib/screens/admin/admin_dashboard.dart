@@ -918,7 +918,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
-            label: 'Manajemen Peminjaman',
+            label: 'Peminjaman',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

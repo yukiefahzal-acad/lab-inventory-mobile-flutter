@@ -145,7 +145,8 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
       case 'pending':
         return AppColors.warning;
       case 'dipinjam':
-        return AppColors.primary;
+      case 'aktif':
+        return AppColors.primaryDark;
       default:
         return AppColors.grey;
     }

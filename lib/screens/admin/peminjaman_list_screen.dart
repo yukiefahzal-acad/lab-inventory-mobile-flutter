@@ -1475,79 +1475,81 @@ class _QRDetailModalState extends State<_QRDetailModal> {
           const SizedBox(height: 28),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: isKembali 
-              ? SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _submitVerifikasi,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.warning,
-                      foregroundColor: AppColors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+            child: isKembali
+                ? SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _submitVerifikasi,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.warning,
+                        foregroundColor: AppColors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text(
+                        'Verifikasi Pengembalian',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'Verifikasi Pengembalian',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: _submitTolak,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                              foregroundColor: AppColors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Tolak',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+
+                      Expanded(
+                        child: SizedBox(
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: _submitVerifikasi,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryDark,
+                              foregroundColor: AppColors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Verifikasi',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 52,
-                        child: OutlinedButton(
-                          onPressed: _submitTolak,
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.error),
-                            foregroundColor: AppColors.error,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: const Text(
-                            'Tolak',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SizedBox(
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: _submitVerifikasi,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.warningDark,
-                            foregroundColor: AppColors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: const Text(
-                            'Setujui',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
           ),
           const SizedBox(height: 32),
         ],

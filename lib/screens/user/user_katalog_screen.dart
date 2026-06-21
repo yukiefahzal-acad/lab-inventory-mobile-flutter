@@ -242,24 +242,18 @@ class _UserKatalogScreenState extends State<UserKatalogScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: isActive
-                                              ? AppColors.primaryDark
+                                              ? AppColors.primary
                                               : AppColors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
+                                          borderRadius: BorderRadius.circular(20),
                                           border: Border.all(
-                                            color: isActive
-                                                ? AppColors.primaryDark
-                                                : AppColors.grey,
+                                            color: AppColors.primary,
                                             width: 1.5,
                                           ),
                                         ),
                                         child: Text(
                                           cat,
-                                          style: TextStyle(
-                                            color: isActive
-                                                ? AppColors.white
-                                                : AppColors.textPrimary,
+                                          style: const TextStyle(
+                                            color: AppColors.textPrimary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
                                           ),

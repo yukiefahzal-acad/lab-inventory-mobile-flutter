@@ -177,22 +177,18 @@ class _AlatListScreenState extends State<AlatListScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primaryDark
+                          ? AppColors.primary
                           : AppColors.transparent,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isSelected
-                            ? AppColors.primaryDark
-                            : AppColors.grey,
+                        color: AppColors.primary,
                         width: 1.5,
                       ),
                     ),
                     child: Text(
                       _filters[index],
-                      style: TextStyle(
-                        color: isSelected
-                            ? AppColors.white
-                            : AppColors.textPrimary,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -365,87 +361,83 @@ class _AlatListScreenState extends State<AlatListScreen> {
                                   Expanded(
                                     child: SizedBox(
                                       height: 34,
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          final confirm = await showDialog<bool>(
-                                            context: context,
-                                            builder: (dialogContext) => AlertDialog(
-                                              title: const Text('Hapus Alat'),
-                                              content: Text(
-                                                'Apakah Anda yakin ingin menghapus "${alat.namaAlat}"?',
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () => Navigator.of(
-                                                    dialogContext,
-                                                  ).pop(false),
-                                                  child: const Text('Batal'),
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            final confirm = await showDialog<bool>(
+                                              context: context,
+                                              builder: (dialogContext) => AlertDialog(
+                                                title: const Text('Hapus Alat'),
+                                                content: Text(
+                                                  'Apakah Anda yakin ingin menghapus "${alat.namaAlat}"?',
                                                 ),
-                                                TextButton(
-                                                  onPressed: () => Navigator.of(
-                                                    dialogContext,
-                                                  ).pop(true),
-                                                  child: const Text(
-                                                    'Hapus',
-                                                    style: TextStyle(
-                                                      color: AppColors.red,
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.of(
+                                                      dialogContext,
+                                                    ).pop(false),
+                                                    child: const Text('Batal'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () => Navigator.of(
+                                                      dialogContext,
+                                                    ).pop(true),
+                                                    child: const Text(
+                                                      'Hapus',
+                                                      style: TextStyle(
+                                                        color: AppColors.red,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                          if (confirm == true) {
-                                            setState(() => _isLoading = true);
-                                            final res = await ApiService.delete(
-                                              'api/alat',
-                                              {'id': alat.id},
+                                                ],
+                                              ),
                                             );
-                                            if (!mounted) return;
-                                            if (res.status == 'success') {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Alat berhasil dihapus',
+                                            if (confirm == true) {
+                                              setState(() => _isLoading = true);
+                                              final res = await ApiService.delete(
+                                                'api/alat',
+                                                {'id': alat.id},
+                                              );
+                                              if (!mounted) return;
+                                              if (res.status == 'success') {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Alat berhasil dihapus',
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                              await _fetchAlat();
-                                            } else {
-                                              setState(() => _isLoading = false);
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(res.message),
-                                                ),
-                                              );
+                                                );
+                                                await _fetchAlat();
+                                              } else {
+                                                setState(() => _isLoading = false);
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(res.message),
+                                                  ),
+                                                );
+                                              }
                                             }
-                                          }
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(
-                                            color: AppColors.errorBg,
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: AppColors.error,
+                                            foregroundColor: AppColors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            padding: EdgeInsets.zero,
+                                            elevation: 0,
                                           ),
-                                          backgroundColor: AppColors.errorBg,
-                                          foregroundColor: AppColors.error,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
+                                          child: const Text(
+                                            'Hapus',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          padding: EdgeInsets.zero,
                                         ),
-                                        child: const Text(
-                                          'Hapus',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ],
