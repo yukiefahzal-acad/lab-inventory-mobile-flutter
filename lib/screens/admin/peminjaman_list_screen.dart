@@ -14,8 +14,40 @@ class PeminjamanItem {
 
   PeminjamanItem({required this.peminjaman, this.denda});
 
+  int get dendaNominalCalculated {
+    if (denda != null) {
+      return denda!.jumlah.toInt();
+    }
+    final s = peminjaman.status.toLowerCase();
+    if (s == 'disetujui' || s == 'active') {
+      DateTime? tglKembali;
+      try {
+        tglKembali = DateTime.parse(peminjaman.tanggalKembali);
+      } catch (_) {}
+      if (tglKembali != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final kembaliDate = DateTime(
+          tglKembali.year,
+          tglKembali.month,
+          tglKembali.day,
+        );
+        if (today.isAfter(kembaliDate)) {
+          int daysLate = today.difference(kembaliDate).inDays;
+          if (daysLate > 0) {
+            final cachedAlat = Alat.cache[peminjaman.alatId];
+            final dendaPerHari = cachedAlat?.dendaPerHari ?? 0;
+            return daysLate * dendaPerHari;
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
   /// Derive visual status:
   /// - 'denda'           → punya denda & belum lunas
+  /// - 'denda_calculated'→ terlambat tapi belum dihitung formal
   /// - 'lunas'           → punya denda & sudah lunas
   /// - 'aktif'           → status peminjaman 'active'
   /// - 'belum_verifikasi'→ status peminjaman 'pending'
@@ -26,6 +58,9 @@ class PeminjamanItem {
     }
     final s = peminjaman.status.toLowerCase();
     if (s == 'disetujui' || s == 'active') {
+      if (dendaNominalCalculated > 0) {
+        return 'denda_calculated';
+      }
       return 'aktif';
     } else if (s == 'menunggu' || s == 'pending') {
       return 'belum_verifikasi';
@@ -77,9 +112,45 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
         final toolName =
             (cachedAlat?.namaAlat ?? item.peminjaman.namaAlat ?? '')
                 .toLowerCase();
+        final qty = 'x${item.peminjaman.jumlah}'.toLowerCase();
+        final tglPinjam = item.peminjaman.tanggalPinjam.toLowerCase();
+        final tglKembali = item.peminjaman.tanggalKembali.toLowerCase();
+        
+        String statusStr = '';
+        switch (item.visualStatus) {
+          case 'denda':
+          case 'denda_calculated':
+            statusStr = 'belum lunas';
+            break;
+          case 'lunas':
+            statusStr = 'lunas';
+            break;
+          case 'aktif':
+            statusStr = 'aktif';
+            break;
+          case 'belum_verifikasi':
+            statusStr = 'belum verifikasi';
+            break;
+          default:
+            statusStr = 'selesai';
+        }
+
+        int nominal = 0;
+        if (item.denda != null) {
+          nominal = item.denda!.jumlah.toInt();
+        } else if (item.dendaNominalCalculated > 0) {
+          nominal = item.dendaNominalCalculated;
+        }
+        final nominalStr = nominal > 0 ? 'rp ${_formatCurrency(nominal.toDouble())}'.toLowerCase() : '';
+
         return studentName.contains(q) ||
             loanIdStr.contains(q) ||
-            toolName.contains(q);
+            toolName.contains(q) ||
+            qty.contains(q) ||
+            tglPinjam.contains(q) ||
+            tglKembali.contains(q) ||
+            statusStr.contains(q) ||
+            nominalStr.contains(q);
       }).toList();
     });
   }
@@ -148,9 +219,10 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
   }
 
   // ─── Badge helper ──────────────────────────────────────────────
-  Widget _buildBadge(String visualStatus) {
-    switch (visualStatus) {
+  Widget _buildBadge(PeminjamanItem item) {
+    switch (item.visualStatus) {
       case 'denda':
+      case 'denda_calculated':
         return _badge('Belum Lunas', AppColors.errorBg, AppColors.error);
       case 'lunas':
         return _badge('Lunas', AppColors.successBg, AppColors.successDark);
@@ -218,6 +290,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
       case 'denda':
         _showDendaModal(item);
         break;
+      case 'denda_calculated':
       case 'aktif':
         _showQRModal(item, isKembali: true);
         break;
@@ -305,30 +378,26 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final searchBar = Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: TextField(
-          controller: _searchCtrl,
-          style: const TextStyle(color: AppColors.black87),
-          decoration: const InputDecoration(
-            hintText: 'Cari...',
-            hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
-            prefixIcon: SizedBox(width: 8),
-            suffixIcon: Icon(Icons.search, color: AppColors.black54),
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 14),
+    final searchBar = Container(
+      color: AppColors.darkSurface,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      child: TextField(
+        controller: _searchCtrl,
+        decoration: InputDecoration(
+          hintText: 'Cari peminjaman',
+          suffixIcon: const Icon(
+            Icons.search,
+            color: AppColors.black,
+          ),
+          filled: true,
+          fillColor: AppColors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 12,
           ),
         ),
       ),
@@ -443,9 +512,10 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      if (item.denda != null) ...[
+                                      if (item.denda != null ||
+                                          item.dendaNominalCalculated > 0) ...[
                                         Text(
-                                          'Rp ${_formatCurrency(item.denda!.jumlah.toDouble())}',
+                                          'Rp ${_formatCurrency(item.dendaNominalCalculated.toDouble())}',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
@@ -456,7 +526,7 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
                                         ),
                                         const SizedBox(height: 6),
                                       ],
-                                      _buildBadge(item.visualStatus),
+                                      _buildBadge(item),
                                     ],
                                   ),
                                 ],
@@ -510,12 +580,8 @@ class _PeminjamanListScreenState extends State<PeminjamanListScreen> {
               elevation: 0,
               pinned: true,
               bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(76),
-                child: Container(
-                  color: AppColors.darkSurface,
-                  width: double.infinity,
-                  child: searchBar,
-                ),
+                preferredSize: const Size.fromHeight(84),
+                child: searchBar,
               ),
             ),
             listContent,

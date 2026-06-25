@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_service.dart';
 import '../../core/app_colors.dart';
+import '../../models/models.dart';
 import '../admin/admin_dashboard.dart';
 import '../user/user_dashboard.dart';
 import 'register_screen.dart';
@@ -56,6 +57,19 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('nama', res.data['nama'] ?? '');
 
       if (!mounted) return;
+
+      // Fetch Alat to populate Alat.cache globally after login
+      final resAlat = await ApiService.get('api/alat');
+      if (resAlat.status == 'success' && resAlat.data != null) {
+        final dataAlat = resAlat.data;
+        final List<dynamic> listData = dataAlat is Map
+            ? (dataAlat['data'] ?? [])
+            : dataAlat;
+        for (final e in listData) {
+          Alat.fromJson(e);
+        }
+      }
+
       if (role == 'admin') {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const AdminDashboard()),

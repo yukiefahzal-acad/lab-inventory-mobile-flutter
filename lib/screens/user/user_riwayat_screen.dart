@@ -39,15 +39,17 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
     if (showLoading) setState(() => _isLoading = true);
     final res = await ApiService.get('api/peminjaman/riwayat');
     final resDenda = await ApiService.get('api/user/denda');
-    
+
     if (res.status == 'success' && res.data != null) {
       final data = res.data;
       final List<dynamic> listData = data is Map ? (data['data'] ?? []) : data;
-      
+
       Map<int, Denda> dendaMap = {};
       if (resDenda.status == 'success' && resDenda.data != null) {
         final dataDenda = resDenda.data;
-        final List<dynamic> listDenda = dataDenda is Map ? (dataDenda['data'] ?? []) : dataDenda;
+        final List<dynamic> listDenda = dataDenda is Map
+            ? (dataDenda['data'] ?? [])
+            : dataDenda;
         final dendas = listDenda.map((e) => Denda.fromJson(e)).toList();
         for (final d in dendas) {
           dendaMap[d.peminjamanId] = d;
@@ -93,13 +95,197 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
     }
   }
 
-  void _showAlatDetailModal(BuildContext context, Alat alat) {
-    AlatDetailModal.show(
-      context,
-      alat: alat,
-      onSubmit: (alatId, quantity, tanggalPinjam, tanggalKembali) =>
-          _submitPeminjaman(alatId, quantity, tanggalPinjam, tanggalKembali),
+  void _showPeminjamanDetailModal(BuildContext context, Peminjaman loan) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        final cachedAlat = Alat.cache[loan.alatId];
+        final firstFoto = cachedAlat?.firstFoto;
+
+        Widget infoRow(String label, String value, {bool isMultiLine = false}) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: isMultiLine
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.black87,
+                        ),
+                      ),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 10,
+            bottom:
+                20 +
+                MediaQuery.of(context).viewInsets.bottom +
+                MediaQuery.of(context).padding.bottom,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (firstFoto != null && firstFoto.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          firstFoto,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholderImage(width: 80, height: 80),
+                        ),
+                      )
+                    else
+                      _buildPlaceholderImage(width: 80, height: 80),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            cachedAlat?.namaAlat ??
+                                loan.namaAlat ??
+                                'Peminjaman #${loan.id ?? 0}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            cachedAlat?.spesifikasi ?? '-',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.black54,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              infoRow(
+                'Tanggal Pinjam',
+                loan.tanggalPinjam.isEmpty ? '-' : loan.tanggalPinjam,
+              ),
+              const SizedBox(height: 12),
+              infoRow(
+                'Tanggal Kembali Rencana',
+                loan.tanggalKembali.isEmpty ? '-' : loan.tanggalKembali,
+              ),
+              const SizedBox(height: 12),
+              infoRow(
+                'Tanggal Kembali Aktual',
+                loan.tanggalKembaliAktual ?? '-',
+              ),
+              const SizedBox(height: 12),
+              infoRow('Jumlah Dipinjam', '${loan.jumlah}'),
+              const SizedBox(height: 12),
+              infoRow('Jumlah Kembali', '${loan.jumlahKembali ?? '-'}'),
+              const SizedBox(height: 12),
+              if (loan.catatanPinjaman != null &&
+                  loan.catatanPinjaman!.isNotEmpty) ...[
+                infoRow(
+                  'Catatan Pinjam',
+                  loan.catatanPinjaman!,
+                  isMultiLine: true,
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (loan.catatanPengembalian != null &&
+                  loan.catatanPengembalian!.isNotEmpty) ...[
+                infoRow(
+                  'Catatan Pengembalian',
+                  loan.catatanPengembalian!,
+                  isMultiLine: true,
+                ),
+                const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  String _formatCurrency(int amount) {
+    final str = amount.toString();
+    final buffer = StringBuffer();
+    for (int i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buffer.write('.');
+      buffer.write(str[i]);
+    }
+    return buffer.toString();
   }
 
   Widget _buildPlaceholderImage({double width = 80, double height = 80}) {
@@ -130,25 +316,99 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
   }
 
   Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'disetujui':
-        return AppColors.success;
-      case 'ditolak':
-      case 'denda':
-      case 'belum lunas':
-        return AppColors.error;
-      case 'dikembalikan':
-      case 'selesai':
-      case 'lunas':
-        return AppColors.success;
-      case 'menunggu':
-      case 'pending':
-        return AppColors.warning;
-      case 'dipinjam':
-      case 'aktif':
-        return AppColors.primaryDark;
-      default:
-        return AppColors.grey;
+    final s = status.toLowerCase();
+    if (s.contains('belum lunas') || s == 'ditolak' || s == 'denda')
+      return AppColors.error;
+    if (s == 'disetujui' ||
+        s == 'dikembalikan' ||
+        s == 'selesai' ||
+        s == 'lunas')
+      return AppColors.success;
+    if (s == 'menunggu' || s == 'pending') return AppColors.warning;
+    if (s == 'dipinjam' || s == 'aktif') return AppColors.primaryDark;
+    return AppColors.grey;
+  }
+
+  int _getCardDendaNominal(Peminjaman loan) {
+    final denda = _userDendaMap[loan.id];
+    if (denda != null && denda.status != 'paid') {
+      return denda.jumlah.toInt();
+    }
+    final s = loan.status.toLowerCase();
+    if (s == 'disetujui' || s == 'aktif' || s == 'dipinjam') {
+      DateTime? tglKembali;
+      try {
+        tglKembali = DateTime.parse(loan.tanggalKembali);
+      } catch (_) {}
+
+      if (tglKembali != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final kembaliDate = DateTime(
+          tglKembali.year,
+          tglKembali.month,
+          tglKembali.day,
+        );
+
+        if (today.isAfter(kembaliDate)) {
+          int daysLate = today.difference(kembaliDate).inDays;
+          if (daysLate > 0) {
+            final cachedAlat = Alat.cache[loan.alatId];
+            final dendaPerHari = cachedAlat?.dendaPerHari ?? 0;
+            return daysLate * dendaPerHari;
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
+  String _getCardStatusDisplay(Peminjaman loan) {
+    String statusDisplay = loan.status;
+    final denda = _userDendaMap[loan.id];
+    final s = statusDisplay.toLowerCase();
+    bool isLateAndActive = false;
+
+    if (s == 'disetujui' || s == 'aktif' || s == 'dipinjam') {
+      DateTime? tglKembali;
+      try {
+        tglKembali = DateTime.parse(loan.tanggalKembali);
+      } catch (_) {}
+
+      if (tglKembali != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final kembaliDate = DateTime(
+          tglKembali.year,
+          tglKembali.month,
+          tglKembali.day,
+        );
+
+        if (today.isAfter(kembaliDate)) {
+          int daysLate = today.difference(kembaliDate).inDays;
+          if (daysLate > 0) {
+            isLateAndActive = true;
+          }
+        }
+      }
+    }
+
+    if (denda != null) {
+      if (denda.status == 'paid') {
+        return 'Lunas';
+      } else {
+        return 'Belum Lunas';
+      }
+    } else {
+      if (isLateAndActive) {
+        return 'Belum Lunas';
+      } else {
+        if (s == 'dikembalikan') return 'Selesai';
+        if (s == 'disetujui') return 'Aktif';
+        if (s == 'denda') return 'Belum Lunas';
+        if (s.isNotEmpty) return s[0].toUpperCase() + s.substring(1);
+        return '';
+      }
     }
   }
 
@@ -158,7 +418,22 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
     final filteredHistory = _allLoansList.where((loan) {
       final toolName = (loan.namaAlat ?? '').toLowerCase();
       final code = 'UNI-00${loan.alatId}'.toLowerCase();
-      return toolName.contains(query) || code.contains(query);
+      final qty = 'x${loan.jumlah}'.toLowerCase();
+      final tglPinjam = loan.tanggalPinjam.toLowerCase();
+      final tglKembali = loan.tanggalKembali.toLowerCase();
+      final statusStr = _getCardStatusDisplay(loan).toLowerCase();
+      final nominal = _getCardDendaNominal(loan);
+      final nominalStr = nominal > 0
+          ? 'rp ${_formatCurrency(nominal)}'.toLowerCase()
+          : '';
+
+      return toolName.contains(query) ||
+          code.contains(query) ||
+          qty.contains(query) ||
+          tglPinjam.contains(query) ||
+          tglKembali.contains(query) ||
+          statusStr.contains(query) ||
+          nominalStr.contains(query);
     }).toList();
 
     return Scaffold(
@@ -168,7 +443,8 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
           : RefreshIndicator(
               onRefresh: () => _fetchRiwayat(showLoading: false),
               color: AppColors.primary,
-              notificationPredicate: (n) => (n.depth == 0 || n.depth == 1) && _allowRefresh,
+              notificationPredicate: (n) =>
+                  (n.depth == 0 || n.depth == 1) && _allowRefresh,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
@@ -194,7 +470,10 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                           controller: _historySearchCtrl,
                           decoration: InputDecoration(
                             hintText: 'Cari riwayat',
-                            suffixIcon: const Icon(Icons.search, color: AppColors.black),
+                            suffixIcon: const Icon(
+                              Icons.search,
+                              color: AppColors.black,
+                            ),
                             filled: true,
                             fillColor: AppColors.white,
                             border: OutlineInputBorder(
@@ -211,7 +490,10 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 4.0,
+                    ),
                     sliver: SliverToBoxAdapter(
                       child: Listener(
                         onPointerDown: (_) => _allowRefresh = false,
@@ -223,7 +505,10 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                   padding: EdgeInsets.only(top: 40.0),
                                   child: Text(
                                     'Anda tidak memiliki pinjaman',
-                                    style: TextStyle(color: AppColors.grey, fontSize: 16),
+                                    style: TextStyle(
+                                      color: AppColors.grey,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ),
                               )
@@ -235,28 +520,16 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                   final loan = filteredHistory[index];
                                   final name = loan.namaAlat ?? 'Nama Alat';
                                   final qty = 'x${loan.jumlah}';
-
-                                  String statusDisplay = loan.status;
-                                  final denda = _userDendaMap[loan.id];
-                                  if (denda != null) {
-                                    statusDisplay = denda.status == 'paid' ? 'Lunas' : 'Belum Lunas';
-                                  } else {
-                                    final s = statusDisplay.toLowerCase();
-                                    if (s == 'dikembalikan') statusDisplay = 'Selesai';
-                                    else if (s == 'disetujui') statusDisplay = 'Aktif';
-                                    else if (s == 'denda') statusDisplay = 'Belum Lunas';
-                                    else if (s.isNotEmpty) statusDisplay = s[0].toUpperCase() + s.substring(1);
-                                  }
-
-                                  final leftText = 'Status: $statusDisplay';
-                                  final rightText = 'Pinjam: ${loan.tanggalPinjam}';
+                                  final statusDisplay = _getCardStatusDisplay(
+                                    loan,
+                                  );
+                                  final dendaNominal = _getCardDendaNominal(
+                                    loan,
+                                  );
 
                                   return GestureDetector(
                                     onTap: () {
-                                      final cachedAlat = Alat.cache[loan.alatId];
-                                      if (cachedAlat != null) {
-                                        _showAlatDetailModal(context, cachedAlat);
-                                      }
+                                      _showPeminjamanDetailModal(context, loan);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(bottom: 12),
@@ -268,21 +541,30 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                       child: Row(
                                         children: [
                                           (() {
-                                            final cachedAlat = Alat.cache[loan.alatId];
-                                            final firstFoto = cachedAlat?.firstFoto;
-                                            if (firstFoto != null && firstFoto.isNotEmpty) {
+                                            final cachedAlat =
+                                                Alat.cache[loan.alatId];
+                                            final firstFoto =
+                                                cachedAlat?.firstFoto;
+                                            if (firstFoto != null &&
+                                                firstFoto.isNotEmpty) {
                                               return ClipRRect(
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                                 child: Image.network(
                                                   firstFoto,
                                                   width: 80,
                                                   height: 80,
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) =>
-                                                      _buildPlaceholderImage(
-                                                        width: 80,
-                                                        height: 80,
-                                                      ),
+                                                  errorBuilder:
+                                                      (
+                                                        context,
+                                                        error,
+                                                        stackTrace,
+                                                      ) =>
+                                                          _buildPlaceholderImage(
+                                                            width: 80,
+                                                            height: 80,
+                                                          ),
                                                 ),
                                               );
                                             }
@@ -294,21 +576,26 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                           const SizedBox(width: 16),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.spaceBetween,
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Expanded(
                                                       child: Text(
                                                         name,
                                                         maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: const TextStyle(
                                                           fontSize: 16,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: AppColors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              AppColors.black,
                                                         ),
                                                       ),
                                                     ),
@@ -323,19 +610,65 @@ class _UserRiwayatScreenState extends State<UserRiwayatScreen> {
                                                 ),
                                                 const SizedBox(height: 12),
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Text(
-                                                      leftText,
+                                                      'Status: $statusDisplay',
                                                       style: TextStyle(
                                                         fontSize: 13,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: _getStatusColor(statusDisplay),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: _getStatusColor(
+                                                          statusDisplay,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    if (dendaNominal > 0) ...[
+                                                      const SizedBox(width: 8),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 6,
+                                                              vertical: 2,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color:
+                                                              AppColors.errorBg,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                4,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          'Rp ${_formatCurrency(dendaNominal)}',
+                                                          style:
+                                                              const TextStyle(
+                                                                color: AppColors
+                                                                    .error,
+                                                                fontSize: 11,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Pinjam: ${loan.tanggalPinjam}',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        color: AppColors.grey,
                                                       ),
                                                     ),
                                                     Text(
-                                                      rightText,
+                                                      'Kembali: ${loan.tanggalKembali}',
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                         color: AppColors.grey,

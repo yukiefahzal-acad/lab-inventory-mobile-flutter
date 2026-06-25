@@ -130,30 +130,26 @@ class _AlatListScreenState extends State<AlatListScreen> {
     final searchAndFilterHeader = Column(
       children: [
         // Search bar
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: _searchCtrl,
-              style: const TextStyle(color: AppColors.black87),
-              decoration: const InputDecoration(
-                hintText: 'Cari alat',
-                hintStyle: TextStyle(color: AppColors.grey, fontSize: 16),
-                prefixIcon: SizedBox(width: 8),
-                suffixIcon: Icon(Icons.search, color: AppColors.black54),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14),
+        Container(
+          color: AppColors.darkSurface,
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+          child: TextField(
+            controller: _searchCtrl,
+            decoration: InputDecoration(
+              hintText: 'Cari alat',
+              suffixIcon: const Icon(
+                Icons.search,
+                color: AppColors.black,
+              ),
+              filled: true,
+              fillColor: AppColors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
               ),
             ),
           ),
@@ -531,7 +527,7 @@ class _AlatListScreenState extends State<AlatListScreen> {
               elevation: 0,
               pinned: true,
               bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(124),
+                preferredSize: const Size.fromHeight(132),
                 child: Container(
                   color: AppColors.darkSurface,
                   child: searchAndFilterHeader,
